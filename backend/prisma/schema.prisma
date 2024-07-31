@@ -43,7 +43,7 @@ model Sales {
   sales_detail SalesDetail[]
 
   cust_id Int
-  cust    Customer @relation(fields: [cust_id], references: [id])
+  cust    Customer @relation(fields: [cust_id], references: [id], onDelete: Cascade)
 }
 
 model SalesDetail {
@@ -57,6 +57,6 @@ model SalesDetail {
   harga_diskon  Int
   total         Int
 
-  sales  Sales  @relation(fields: [sales_id], references: [id])
-  barang Barang @relation(fields: [barang_id], references: [id])
+  sales  Sales  @relation(fields: [sales_id], references: [id], onDelete: Cascade)
+  barang Barang @relation(fields: [barang_id], references: [id], onDelete: Cascade)
 }
