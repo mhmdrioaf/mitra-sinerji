@@ -1,7 +1,7 @@
 import { BadRequestException } from '@nestjs/common';
 import { OmitType, PartialType } from '@nestjs/mapped-types';
 import { Transform } from 'class-transformer';
-import { IsBoolean, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsNumber } from 'class-validator';
 
 export class CreateBarangDto {
   @IsNotEmpty({
@@ -32,45 +32,6 @@ export class CreateBarangDto {
     return value;
   })
   harga: number;
-
-  @IsOptional()
-  @IsBoolean()
-  @Transform(({ value }) => {
-    if (typeof value !== 'boolean') {
-      if (value === 'true') {
-        return true;
-      } else {
-        return false;
-      }
-    }
-
-    return value;
-  })
-  is_diskon: boolean;
-
-  @IsOptional()
-  @IsNumber()
-  @Transform(({ value }) => {
-    if (typeof value === 'string') {
-      const diskon = Number(value);
-      if (isNaN(diskon)) {
-        throw new BadRequestException({
-          status: 400,
-          message: 'Diskon barang harus berupa angka',
-          data: null,
-        });
-      }
-
-      if (diskon > 100) {
-        return 100;
-      }
-
-      return diskon;
-    }
-
-    return value;
-  })
-  diskon: number;
 }
 
 export class UpdateBarangDto extends PartialType(

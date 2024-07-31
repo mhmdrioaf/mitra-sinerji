@@ -14,12 +14,10 @@ datasource db {
 }
 
 model Barang {
-  id        Int     @id @default(autoincrement())
-  kode      String  @unique @db.VarChar(10)
-  nama      String  @db.VarChar(100)
-  harga     Int
-  is_diskon Boolean @default(false)
-  diskon    Int     @default(0)
+  id    Int    @id @default(autoincrement())
+  kode  String @unique @db.VarChar(10)
+  nama  String @db.VarChar(100)
+  harga Int
 }
 
 model Customer {
