@@ -9,7 +9,7 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
-import { TCreateBarangDto, TUpdateBarangDto } from './barang.constants';
+import { CreateBarangDto, UpdateBarangDto } from './barang.dto';
 import { BarangService } from './barang.service';
 
 @Controller('barang')
@@ -30,23 +30,21 @@ export class BarangController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async createBarang(@Body() newBarang: TCreateBarangDto) {
+  async createBarang(@Body() newBarang: CreateBarangDto) {
     return await this.barangService.createBarang(newBarang);
   }
 
-  @Patch(':id')
+  @Patch('update/:id')
   @HttpCode(HttpStatus.OK)
   async updateBarang(
     @Param() param: { id: string },
-    @Body() updatedBarang: TUpdateBarangDto,
+    @Body() updatedBarang: UpdateBarangDto,
   ) {
-    return await this.barangService.updateBarang({
-      id: Number(param.id),
-      ...updatedBarang,
-    });
+    const barangId = Number(param.id);
+    return await this.barangService.updateBarang(barangId, updatedBarang);
   }
 
-  @Delete(':id')
+  @Delete('delete/:id')
   @HttpCode(HttpStatus.OK)
   async deleteBarang(@Param() param: { id: string }) {
     return await this.barangService.deleteBarang(Number(param.id));

@@ -1,15 +1,14 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { PrismaService } from 'src/prisma/prisma.service';
 import {
-  TCreateBarangDto,
   TCreateBarangResponse,
   TDeleteBarangResponse,
   TGetBarangResponse,
   TListBarangResponse,
-  TUpdateBarangDto,
   TUpdateBarangResponse,
 } from './barang.constants';
+import { CreateBarangDto, UpdateBarangDto } from './barang.dto';
 
 @Injectable()
 export class BarangService {
@@ -52,7 +51,7 @@ export class BarangService {
   }
 
   async createBarang(
-    newBarang: TCreateBarangDto,
+    newBarang: CreateBarangDto,
   ): Promise<TCreateBarangResponse> {
     try {
       const createdBarang = await this.prismaService.barang.create({
@@ -60,6 +59,7 @@ export class BarangService {
       });
       return {
         status: HttpStatus.CREATED,
+        message: ['Barang berhasil ditambahkan'],
         data: createdBarang,
       };
     } catch (error) {
@@ -67,44 +67,50 @@ export class BarangService {
 
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
-          return {
+          throw new BadRequestException({
             status: HttpStatus.BAD_REQUEST,
             message: 'Kode barang sudah terdaftar, silahkan gunakan kode lain',
             data: null,
-          };
+          });
         }
-      } else {
-        return {
-          status: HttpStatus.INTERNAL_SERVER_ERROR,
-          message:
-            'Terjadi kesalahan saat menambahkan barang, pastikan semua data sudah diisi',
-          data: null,
-        };
       }
+
+      throw error;
     }
   }
 
   async updateBarang(
-    updatedBarang: TUpdateBarangDto,
+    barangId: number,
+    updatedBarang: UpdateBarangDto,
   ): Promise<TUpdateBarangResponse> {
     try {
+      console.log(updatedBarang);
       const updatedBarangData = await this.prismaService.barang.update({
         where: {
-          id: updatedBarang.id,
+          id: barangId,
         },
         data: updatedBarang,
       });
 
       return {
         status: HttpStatus.OK,
+        message: ['Barang berhasil diperbarui'],
         data: updatedBarangData,
       };
     } catch (error) {
       console.error('[API ERROR] Error while updating barang: ', error);
-      return {
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
-        data: null,
-      };
+
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new BadRequestException({
+            status: HttpStatus.BAD_REQUEST,
+            message: ['Data barang tidak ditemukan'],
+            data: null,
+          });
+        }
+      }
+
+      throw error;
     }
   }
 
@@ -119,20 +125,27 @@ export class BarangService {
       if (deleteBarang) {
         return {
           status: HttpStatus.OK,
-          message: 'Barang berhasil dihapus',
+          message: ['Barang berhasil dihapus'],
         };
       } else {
         return {
           status: HttpStatus.BAD_REQUEST,
-          message: 'Barang gagal dihapus',
+          message: ['Barang gagal dihapus'],
         };
       }
     } catch (error) {
       console.error('[API ERROR] Error while deleting barang: ', error);
-      return {
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: 'Terjadi kesalahan saat menghapus barang',
-      };
+
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new BadRequestException({
+            status: HttpStatus.BAD_REQUEST,
+            message: ['Data barang tidak ditemukan'],
+          });
+        }
+      }
+
+      throw error;
     }
   }
 }

@@ -1,11 +1,8 @@
 import { Barang } from '@prisma/client';
 
-export type TCreateBarangDto = Omit<Barang, 'id'>;
-export type TUpdateBarangDto = Omit<Barang, 'kode'>;
-
 export type TDeleteBarangResponse = {
   status: number;
-  message: string;
+  message: string[];
 };
 
 export type TListBarangResponse = {
@@ -20,11 +17,8 @@ export type TGetBarangResponse = {
 
 export type TCreateBarangResponse = {
   status: number;
-  message?: string;
+  message?: string[];
   data: Barang;
 };
 
-export type TUpdateBarangResponse = {
-  status: number;
-  data: Barang;
-};
+export type TUpdateBarangResponse = TCreateBarangResponse;
