@@ -69,7 +69,9 @@ export class BarangService {
         if (error.code === 'P2002') {
           throw new BadRequestException({
             status: HttpStatus.BAD_REQUEST,
-            message: 'Kode barang sudah terdaftar, silahkan gunakan kode lain',
+            message: [
+              'Kode barang sudah terdaftar, silahkan gunakan kode lain',
+            ],
             data: null,
           });
         }
