@@ -14,12 +14,12 @@ datasource db {
 }
 
 model Barang {
-  id        Int     @id @default(autoincrement())
-  kode      String  @unique @db.VarChar(10)
-  nama      String  @db.VarChar(100)
-  harga     Int
-  is_diskon Boolean @default(false)
-  diskon    Int     @default(0)
+  id    Int    @id @default(autoincrement())
+  kode  String @unique @db.VarChar(10)
+  nama  String @db.VarChar(100)
+  harga Int
+
+  sales_detail SalesDetail[]
 }
 
 model Customer {
@@ -27,4 +27,36 @@ model Customer {
   kode String @unique @db.VarChar(10)
   name String @db.VarChar(100)
   telp String @db.VarChar(20)
+
+  sales Sales[]
+}
+
+model Sales {
+  id          Int      @id @default(autoincrement())
+  kode        String   @unique @db.VarChar(15)
+  tgl         DateTime @default(now())
+  subtotal    Int
+  diskon      Int
+  ongkir      Int
+  total_bayar Int
+
+  sales_detail SalesDetail[]
+
+  cust_id Int
+  cust    Customer @relation(fields: [cust_id], references: [id], onDelete: Cascade)
+}
+
+model SalesDetail {
+  id            Int @id @default(autoincrement())
+  sales_id      Int
+  barang_id     Int
+  harga_bandrol Int
+  qty           Int
+  diskon_pct    Int
+  diskon_nilai  Int
+  harga_diskon  Int
+  total         Int
+
+  sales  Sales  @relation(fields: [sales_id], references: [id], onDelete: Cascade)
+  barang Barang @relation(fields: [barang_id], references: [id], onDelete: Cascade)
 }
