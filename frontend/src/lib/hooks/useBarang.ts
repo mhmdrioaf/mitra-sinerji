@@ -72,9 +72,13 @@ export function useBarang() {
   function filterData() {
     if (response && response.data) {
       if (search) {
-        const filteredDataBarang = response.data.filter((barang) =>
-          barang.nama.toLowerCase().includes(search.toLowerCase())
-        );
+        const filteredDataBarang = response.data.filter((barang) => {
+          return (
+            barang.kode.toLowerCase().includes(search.toLowerCase()) ||
+            barang.nama.toLowerCase().includes(search.toLowerCase()) ||
+            barang.id.toString().includes(search.toLowerCase())
+          );
+        });
 
         return sortData(filteredDataBarang, sortOptions.by ?? "nama");
       }
