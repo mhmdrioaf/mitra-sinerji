@@ -18,7 +18,7 @@ export default function Header() {
   const isActive = (currentPath: string) => pathname === currentPath;
 
   return (
-    <header className="w-full px-4 md:px-8 py-2 sticky top-0 left-0 justify-between inline-flex items-center bg-white/30 backdrop-blur-sm border-b border-b-input">
+    <header className="w-full px-4 md:px-8 py-2 sticky top-0 left-0 justify-between inline-flex items-center bg-white/30 backdrop-blur-sm border-b border-b-input z-50">
       <Link href="/" className="flex flex-col gap-px">
         <h1 className="text-lg md:text-xl font-bold">
           PT. Mitra Sinerji Teknoindo
