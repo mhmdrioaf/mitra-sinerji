@@ -1,6 +1,6 @@
 import FormBarang from "@/components/ui/forms/FormBarang";
-import { getBarang } from "@/lib/api/barang";
 import { FormBarangAction } from "@/lib/api/barang/definitions";
+import { getBarang } from "@/lib/api/barang/fetcher";
 
 export default async function DetailBarang({
   params,
