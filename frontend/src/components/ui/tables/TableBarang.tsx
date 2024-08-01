@@ -1,11 +1,10 @@
 "use client";
 
-import { TBarang, TListBarangApiResponse } from "@/lib/api/barang/definitions";
-import { listBarang } from "@/lib/api/barang/fetcher";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { FilterIcon, SortAscIcon, SortDescIcon } from "lucide-react";
+import { TBarang } from "@/lib/api/barang/definitions";
+import { useBarang } from "@/lib/hooks/useBarang";
+import { SortAscIcon, SortDescIcon } from "lucide-react";
 import Link from "next/link";
-import React from "react";
+import { twMerge } from "tailwind-merge";
 import { Button } from "../button";
 import DeleteBarang from "../forms/DeleteBarang";
 import { Input } from "../input";
@@ -22,90 +21,59 @@ import {
 } from "../table";
 import TableSkeleton from "./TableSkeleton";
 
-export default function TableBarang() {
-  const queryClient = useQueryClient();
-  const {
-    data: dataBarang,
-    error,
-    isLoading,
-  } = useQuery<TListBarangApiResponse>({
-    queryKey: ["barang"],
-    queryFn: listBarang,
-  });
-
-  const mutation = useMutation({
-    mutationFn: listBarang,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["barang"] });
-    },
-  });
-
-  const [search, setSearch] = React.useState<string>("");
-  const [sortOptions, setSortOptions] = React.useState<{
+interface IBarangTableHeadProps {
+  dataKey: keyof TBarang;
+  title: string;
+  centered?: boolean;
+  bordered?: boolean;
+  onSort: (key: keyof TBarang) => void;
+  currentSort: {
     by: keyof TBarang | null;
     order: "asc" | "desc";
-  }>({
-    by: null,
-    order: "asc",
-  });
-  const keysBarang: (keyof TBarang)[] = ["id", "kode", "nama", "harga"];
-
-  const sortDataBarang = (data: TBarang[], key: keyof TBarang) => {
-    return data.sort((a, b) => {
-      if (sortOptions.order === "asc") {
-        if (a[key] < b[key]) {
-          return -1;
-        }
-        if (a[key] > b[key]) {
-          return 1;
-        }
-        return 0;
-      } else {
-        if (a[key] > b[key]) {
-          return -1;
-        }
-        if (a[key] < b[key]) {
-          return 1;
-        }
-        return 0;
-      }
-    });
   };
+}
 
-  const handleSort = (option: keyof TBarang) => {
-    setSortOptions((prev) => ({
-      ...prev,
-      by: prev.by === option ? null : option,
-    }));
-  };
+function BarangTableHead({
+  dataKey,
+  title,
+  centered = false,
+  bordered = false,
+  onSort,
+  currentSort,
+}: IBarangTableHeadProps) {
+  return (
+    <TableHead
+      className={twMerge(
+        "text-left",
+        bordered && "border-r",
+        centered && "text-center"
+      )}
+    >
+      <Button
+        variant="ghost"
+        onClick={() => onSort(dataKey)}
+        className="w-full"
+      >
+        <span className="mr-2">{title}</span>
+        {currentSort.by === dataKey ? (
+          currentSort.order === "asc" ? (
+            <SortAscIcon className="w-4 h-4" />
+          ) : (
+            <SortDescIcon className="w-4 h-4" />
+          )
+        ) : null}
+      </Button>
+    </TableHead>
+  );
+}
 
-  const handleOrder = () => {
-    setSortOptions((prev) => ({
-      ...prev,
-      order: prev.order === "asc" ? "desc" : "asc",
-    }));
-  };
-
-  const filterData = () => {
-    if (dataBarang && dataBarang.data) {
-      if (search) {
-        const filteredDataBarang = dataBarang.data.filter((barang) =>
-          barang.nama.toLowerCase().includes(search.toLowerCase())
-        );
-
-        return sortDataBarang(filteredDataBarang, sortOptions.by ?? "nama");
-      }
-
-      return sortDataBarang(dataBarang.data, sortOptions.by ?? "kode");
-    }
-  };
-
-  const barang = filterData();
+export default function TableBarang() {
+  const barang = useBarang();
 
   return (
     <div className="w-full flex flex-col gap-4">
-      <div className="w-full grid grid-cols-4 md:grid-cols-3 gap-2">
-        <div className="col-span-4 md:col-span-1 flex flex-col gap-2">
+      <div className="w-full grid grid-cols-4 gap-4 md:gap-8">
+        <div className="col-span-4 md:col-span-3 flex flex-col gap-2">
           <Label htmlFor="search">Cari Barang</Label>
           <Input
             type="text"
@@ -113,43 +81,11 @@ export default function TableBarang() {
             name="search"
             placeholder="Cari berdasarkan nama barang"
             className="w-full"
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => barang.data.handler.search(e.target.value)}
           />
         </div>
 
-        <Popover>
-          <div className="col-span-2 md:col-span-1 md:self-end inline-flex items-center gap-2">
-            <PopoverTrigger asChild className="w-full">
-              <Button variant="outline">
-                <FilterIcon className="w-4 h-4" />
-                <span>Urutkan Data</span>
-              </Button>
-            </PopoverTrigger>
-
-            <Button variant="outline" onClick={handleOrder}>
-              {sortOptions.order === "asc" ? (
-                <SortAscIcon className="w-4 h-4" />
-              ) : (
-                <SortDescIcon className="w-4 h-4" />
-              )}
-            </Button>
-          </div>
-          <PopoverContent>
-            <div className="w-full flex flex-col gap-2">
-              {keysBarang.map((key) => (
-                <Button
-                  key={key}
-                  variant={sortOptions.by === key ? "default" : "outline"}
-                  onClick={() => handleSort(key)}
-                >
-                  {key}
-                </Button>
-              ))}
-            </div>
-          </PopoverContent>
-        </Popover>
-
-        <Button asChild className="col-span-2 md:col-span-1 md:self-end">
+        <Button asChild className="col-span-4 md:col-span-1 md:self-end">
           <Link href="/barang/create">Tambah Barang</Link>
         </Button>
       </div>
@@ -159,17 +95,43 @@ export default function TableBarang() {
         <TableHeader>
           <TableRow className="border">
             <TableHead className="text-center border-r">No.</TableHead>
-            <TableHead className="text-center border-r">ID Barang</TableHead>
-            <TableHead className="text-center border-r">Kode Barang</TableHead>
-            <TableHead className="border-r">Nama Barang</TableHead>
-            <TableHead className="text-left border-r">Harga Barang</TableHead>
+            <BarangTableHead
+              dataKey="id"
+              title="ID Barang"
+              currentSort={barang.sort.state.options}
+              onSort={() => barang.sort.handler.sort("id")}
+              centered
+              bordered
+            />
+            <BarangTableHead
+              dataKey="kode"
+              title="Kode Barang"
+              currentSort={barang.sort.state.options}
+              onSort={() => barang.sort.handler.sort("kode")}
+              centered
+              bordered
+            />
+            <BarangTableHead
+              dataKey="nama"
+              title="Nama Barang"
+              currentSort={barang.sort.state.options}
+              onSort={() => barang.sort.handler.sort("nama")}
+              bordered
+            />
+            <BarangTableHead
+              dataKey="harga"
+              title="Harga Barang"
+              currentSort={barang.sort.state.options}
+              onSort={() => barang.sort.handler.sort("harga")}
+              bordered
+            />
             <TableHead className="text-center">Aksi</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody className="border">
-          {isLoading && <TableSkeleton rows={6} />}
+          {barang.data.state.isLoading && <TableSkeleton rows={6} />}
 
-          {error && (
+          {barang.data.state.error && (
             <TableRow>
               <TableCell colSpan={6} className="text-center">
                 Terjadi kesalahan saat memuat data barang...
@@ -177,26 +139,26 @@ export default function TableBarang() {
             </TableRow>
           )}
 
-          {barang && (
+          {barang.data.state.barang && (
             <>
-              {barang.length > 0 ? (
-                barang.map((barang, idx) => (
+              {barang.data.state.barang.length > 0 ? (
+                barang.data.state.barang.map((data, idx) => (
                   <TableRow
-                    key={barang.id}
+                    key={data.id}
                     className="even:bg-neutral-100 even:hover:bg-neutral-100"
                   >
                     <TableCell className="text-center border-r">
                       {idx + 1}
                     </TableCell>
                     <TableCell className="text-center border-r">
-                      {barang.id}
+                      {data.id}
                     </TableCell>
                     <TableCell className="text-center border-r">
-                      {barang.kode}
+                      {data.kode}
                     </TableCell>
-                    <TableCell className="border-r">{barang.nama}</TableCell>
+                    <TableCell className="border-r">{data.nama}</TableCell>
                     <TableCell className="text-left border-r">
-                      {barang.harga.toLocaleString("id-ID", {
+                      {data.harga.toLocaleString("id-ID", {
                         style: "currency",
                         currency: "IDR",
                       })}
@@ -213,12 +175,14 @@ export default function TableBarang() {
                               variant="outline"
                               className="w-full"
                             >
-                              <Link href={`/barang/${barang.id}`}>Edit</Link>
+                              <Link href={`/barang/${data.id}`}>Edit</Link>
                             </Button>
                             <DeleteBarang
-                              id={barang.id}
+                              id={data.id}
                               redirect={false}
-                              callback={() => mutation.mutate()}
+                              callback={() =>
+                                barang.data.handler.mutation.mutate()
+                              }
                             />
                           </div>
                         </PopoverContent>
