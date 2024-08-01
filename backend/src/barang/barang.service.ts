@@ -86,7 +86,6 @@ export class BarangService {
     updatedBarang: UpdateBarangDto,
   ): Promise<TUpdateBarangResponse> {
     try {
-      console.log(updatedBarang);
       const updatedBarangData = await this.prismaService.barang.update({
         where: {
           id: barangId,
