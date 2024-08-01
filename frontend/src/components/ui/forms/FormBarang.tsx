@@ -1,6 +1,6 @@
 "use client";
 
-import { createBarang, deleteBarang, updateBarang } from "@/lib/api/barang";
+import { createBarang, updateBarang } from "@/lib/api/barang";
 import {
   BarangDto,
   FormBarangAction,
@@ -12,22 +12,12 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { twMerge } from "tailwind-merge";
 import * as z from "zod";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "../alert-dialog";
 import { Button } from "../button";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "../form";
 import { Input } from "../input";
 import { useToast } from "../use-toast";
 import CurrencyInput from "./CurrencyInput";
+import DeleteBarang from "./DeleteBarang";
 
 interface IFormBarangProps {
   action?: FormBarangAction;
@@ -84,7 +74,7 @@ export default function FormBarang({
 
     if (response.status === 201 || response.status === 200) {
       form.reset();
-      router.push("/");
+      router.back();
       toast({
         title: "Berhasil menyimpan data",
         description: response.message?.at(0),
@@ -98,29 +88,6 @@ export default function FormBarang({
     }
 
     setSubmitting(false);
-  };
-
-  const onDelete = async () => {
-    setDeleting(true);
-    const id = defaultValues!.id;
-    const response = await deleteBarang(id);
-
-    if (response.status === 200) {
-      setDeleting(false);
-      router.replace("/");
-      toast({
-        title: "Berhasil menghapus data",
-        description: response.message?.at(0),
-      });
-    } else {
-      toast({
-        variant: "destructive",
-        title: "Gagal menghapus data",
-        description: response.message?.at(0),
-      });
-    }
-
-    setDeleting(false);
   };
 
   return (
@@ -175,39 +142,7 @@ export default function FormBarang({
         </Button>
 
         {action === FormBarangAction.Update && (
-          <AlertDialog>
-            <Button variant="destructive" asChild disabled={deleting}>
-              <AlertDialogTrigger>
-                {deleting && (
-                  <Loader2Icon className="w-4 h-4 mr-2 animate-spin" />
-                )}
-                <span>Hapus Barang</span>
-              </AlertDialogTrigger>
-            </Button>
-
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>
-                  Apakah anda yakin akan menghapus barang ini?
-                </AlertDialogTitle>
-                <AlertDialogDescription>
-                  Harap di ingat bahwa barang ini tidak akan dapat dikembalikan
-                  setelah di hapus.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Batal</AlertDialogCancel>
-                <Button variant="destructive" asChild disabled={deleting}>
-                  <AlertDialogAction onClick={onDelete}>
-                    {deleting && (
-                      <Loader2Icon className="w-4 h-4 mr-2 animate-spin" />
-                    )}
-                    Hapus
-                  </AlertDialogAction>
-                </Button>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          <DeleteBarang id={defaultValues!.id} />
         )}
       </form>
     </Form>

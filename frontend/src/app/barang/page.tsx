@@ -1,13 +1,11 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+"use client";
+
 import TableBarang from "@/components/ui/tables/TableBarang";
-import { listBarang } from "@/lib/api/barang";
-import Link from "next/link";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-export default async function ListBarangPage() {
-  const dataBarang = await listBarang();
+const queryClient = new QueryClient();
 
+export default function ListBarangPage() {
   return (
     <div className="w-full flex flex-col gap-4 md:gap-8 px-4 md:px-8 py-2 min-h-svh">
       <div className="w-full flex flex-col gap-px">
@@ -17,24 +15,9 @@ export default async function ListBarangPage() {
         </p>
       </div>
 
-      <div className="w-full inline-flex gap-8 items-end justify-between">
-        <form className="w-full max-w-md flex flex-col gap-2">
-          <Label htmlFor="search">Cari Barang</Label>
-          <Input
-            type="text"
-            id="search"
-            name="search"
-            placeholder="Cari berdasarkan nama barang"
-            className="w-full"
-          />
-        </form>
-
-        <Button asChild>
-          <Link href="/barang/create">Tambah Barang</Link>
-        </Button>
-      </div>
-
-      <TableBarang />
+      <QueryClientProvider client={queryClient}>
+        <TableBarang />
+      </QueryClientProvider>
     </div>
   );
 }

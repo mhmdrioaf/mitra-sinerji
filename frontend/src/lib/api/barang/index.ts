@@ -7,17 +7,8 @@ import {
   BarangDto,
   TCreateBarangApiResponse,
   TDeleteBarangApiResponse,
-  TGetBarangApiResponse,
-  TListBarangApiResponse,
   TUpdateBarangApiResponse,
 } from "./definitions";
-
-export async function listBarang(): Promise<TListBarangApiResponse> {
-  const res = await fetch(ApiEndpoint.Barang.List);
-  const response: TListBarangApiResponse = await res.json();
-
-  return response;
-}
 
 export async function createBarang(
   dto: z.infer<typeof BarangDto>
@@ -32,18 +23,9 @@ export async function createBarang(
 
   const response: TCreateBarangApiResponse = await res.json();
 
-  console.log(response);
-
   if (response.status === 201) {
     revalidatePath("/", "layout");
   }
-
-  return response;
-}
-
-export async function getBarang(id: number): Promise<TGetBarangApiResponse> {
-  const res = await fetch(ApiEndpoint.Barang.Detail(id));
-  const response: TGetBarangApiResponse = await res.json();
 
   return response;
 }

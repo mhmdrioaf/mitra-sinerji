@@ -1,5 +1,5 @@
 import FormBarang from "@/components/ui/forms/FormBarang";
-import { listBarang } from "@/lib/api/barang";
+import { listBarang } from "@/lib/api/barang/fetcher";
 import Link from "next/link";
 
 export default async function Home() {
