@@ -4,6 +4,7 @@
 
 import { useReducer } from "react";
 import { UseFormReturn } from "react-hook-form";
+import { twMerge } from "tailwind-merge";
 import {
   FormControl,
   FormField,
@@ -18,6 +19,7 @@ type TextInputProps = {
   name: string;
   label: string;
   placeholder: string;
+  className?: string;
 };
 
 const currencyFormatter = Intl.NumberFormat("id-ID", {
@@ -65,6 +67,7 @@ export default function CurrencyInput(props: TextInputProps) {
                   handleChange(_change, ev.target.value);
                 }}
                 value={value}
+                className={twMerge("", props.className)}
               />
             </FormControl>
             <FormMessage />
