@@ -79,7 +79,7 @@ export default function TableBarang() {
             type="text"
             id="search"
             name="search"
-            placeholder="Cari berdasarkan nama barang"
+            placeholder="Cari berdasarkan id, nama, kode"
             className="w-full"
             onChange={(e) => barang.data.handler.search(e.target.value)}
           />
