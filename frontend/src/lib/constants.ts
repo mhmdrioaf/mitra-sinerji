@@ -9,4 +9,11 @@ export const ApiEndpoint = {
     Update: (id: number) => API_BASE_URL + `/api/barang/update/${id}`,
     Delete: (id: number) => API_BASE_URL + `/api/barang/delete/${id}`,
   },
+  Customer: {
+    List: API_BASE_URL + "/api/customer",
+    Detail: (id: number) => API_BASE_URL + `/api/customer/${id}`,
+    Create: API_BASE_URL + "/api/customer",
+    Update: (id: number) => API_BASE_URL + `/api/customer/update/${id}`,
+    Delete: (id: number) => API_BASE_URL + `/api/customer/delete/${id}`,
+  },
 };
