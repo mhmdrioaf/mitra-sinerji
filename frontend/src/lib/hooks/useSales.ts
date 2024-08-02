@@ -7,6 +7,7 @@ import React from "react";
 import { useForm, UseFormReturn } from "react-hook-form";
 import * as z from "zod";
 import { TBarang } from "../api/barang/definitions";
+import { TCustomer } from "../api/customer/definitions";
 import { createSales } from "../api/sales/actions";
 import { SalesDto, TSalesDetail } from "../api/sales/definitions";
 
@@ -24,6 +25,7 @@ export type TSalesHook = {
     productData: TSalesDetail[];
 
     barang: TBarang[];
+    customer: TCustomer[];
 
     handler: {
       salesDetail: {
@@ -39,27 +41,48 @@ export type TSalesHook = {
       selectDate: (date: Date | undefined) => void;
 
       submit: (data: z.infer<typeof SalesDto>) => Promise<void>;
+      search: (key: keyof TSearch, value: string) => void;
     };
   };
 };
 
+export type TSearch = {
+  customer: string;
+  barang: string;
+};
+
 export function useSales({
   dataBarang,
+  dataCustomer,
 }: {
   dataBarang?: TBarang[];
+  dataCustomer: TCustomer[];
 }): TSalesHook {
   const [productData, setProductData] = React.useState<TSalesDetail[]>([]);
   const [customerId, setCustomerId] = React.useState<number | null>(null);
   const [submitting, setSubmitting] = React.useState<boolean>(false);
   const [date, setDate] = React.useState<string>();
+  const [search, setSearch] = React.useState<TSearch>({
+    barang: "",
+    customer: "",
+  });
 
   const { toast } = useToast();
   const router = useRouter();
 
   const barangToAdd =
     dataBarang?.filter(
-      (item) => !productData.find((detail) => detail.barang.id === item.id)
+      (item) =>
+        !productData.find((detail) => detail.barang.id === item.id) &&
+        (item.nama.toLowerCase().includes(search.barang.toLowerCase()) ||
+          item.kode.toLowerCase().includes(search.barang.toLowerCase()))
     ) ?? [];
+
+  const customers = dataCustomer.filter(
+    (customer) =>
+      customer.name.toLowerCase().includes(search.customer.toLowerCase()) ||
+      customer.kode.toLowerCase().includes(search.customer.toLowerCase())
+  );
 
   const form = useForm<z.infer<typeof SalesDto>>({
     defaultValues: {
@@ -260,6 +283,13 @@ export function useSales({
     setDate(undefined);
   }
 
+  function onSearch(key: keyof TSearch, value: string) {
+    setSearch((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  }
+
   return {
     state: {
       customerId,
@@ -273,6 +303,7 @@ export function useSales({
       form,
       productData,
       barang: barangToAdd,
+      customer: customers,
       handler: {
         salesDetail: {
           add: addBarang,
@@ -285,6 +316,7 @@ export function useSales({
         resetForm: onReset,
         selectDate: onDateSelect,
         submit: onSubmit,
+        search: onSearch,
       },
     },
   };
