@@ -9,7 +9,9 @@ export async function listSales(): Promise<TListSalesApiResponse> {
 }
 
 export async function getSalesById(id: number): Promise<TGetSalesApiResponse> {
-  const res = await fetch(ApiEndpoint.Sales.Detail(id));
+  const res = await fetch(ApiEndpoint.Sales.Detail(id), {
+    cache: "no-store",
+  });
   const response: TGetSalesApiResponse = await res.json();
 
   return response;
