@@ -43,7 +43,7 @@ interface IFormSales {
 }
 
 export default function FormSales({ dataBarang, dataCustomer }: IFormSales) {
-  const { form, state } = useSales({ dataBarang });
+  const { form, state } = useSales({ dataBarang, dataCustomer });
 
   return (
     <div className="min-h-svh relative">
@@ -58,6 +58,13 @@ export default function FormSales({ dataBarang, dataCustomer }: IFormSales) {
               </PopoverTrigger>
               <PopoverContent>
                 <div className="w-full flex flex-col gap-2">
+                  <Input
+                    type="text"
+                    onChange={(e) =>
+                      form.handler.search("barang", e.target.value)
+                    }
+                    placeholder="Cari berdasarkan nama atau kode"
+                  />
                   {form.barang.map((barang) => (
                     <Button
                       variant="outline"
@@ -83,7 +90,14 @@ export default function FormSales({ dataBarang, dataCustomer }: IFormSales) {
               </PopoverTrigger>
               <PopoverContent>
                 <div className="w-full flex flex-col gap-2">
-                  {dataCustomer.map((customer) => (
+                  <Input
+                    type="text"
+                    onChange={(e) =>
+                      form.handler.search("customer", e.target.value)
+                    }
+                    placeholder="Cari berdasarkan nama atau kode"
+                  />
+                  {form.customer.map((customer) => (
                     <Button
                       variant={
                         state.customerId === customer.id ? "default" : "outline"
