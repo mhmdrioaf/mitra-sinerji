@@ -34,6 +34,7 @@ export const SalesDto = z.object({
 
 export type TSales = {
   id: number;
+  kode: string;
   tgl: string;
   subtotal: number;
   diskon: number;
