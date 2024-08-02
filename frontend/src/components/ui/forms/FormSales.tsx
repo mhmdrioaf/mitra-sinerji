@@ -2,8 +2,7 @@
 
 import { TBarang } from "@/lib/api/barang/definitions";
 import { TCustomer } from "@/lib/api/customer/definitions";
-import { createSales } from "@/lib/api/sales/actions";
-import { SalesDto, TSalesDetail } from "@/lib/api/sales/definitions";
+import { useSales } from "@/lib/hooks/useSales";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import {
@@ -12,10 +11,6 @@ import {
   Loader2Icon,
   Trash2Icon,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import React from "react";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -40,7 +35,6 @@ import {
   TableHeader,
   TableRow,
 } from "../table";
-import { useToast } from "../use-toast";
 import CurrencyInput from "./CurrencyInput";
 
 interface IFormSales {
@@ -49,213 +43,7 @@ interface IFormSales {
 }
 
 export default function FormSales({ dataBarang, dataCustomer }: IFormSales) {
-  const [productData, setProductData] = React.useState<TSalesDetail[]>([]);
-  const [customerId, setCustomerId] = React.useState<number | null>(null);
-  const [submitting, setSubmitting] = React.useState<boolean>(false);
-  const [date, setDate] = React.useState<string>();
-
-  const form = useForm<z.infer<typeof SalesDto>>({
-    defaultValues: {
-      subtotal: 0,
-      diskon: 0,
-      ongkir: 0,
-      total_bayar: 0,
-      salesDetail: [],
-    },
-  });
-
-  const { toast } = useToast();
-  const router = useRouter();
-
-  const addBarang = (id: number) => {
-    setProductData((prev) => {
-      const barang = dataBarang.find((item) => item.id === id);
-      if (!barang) return prev;
-
-      const productData: TSalesDetail = {
-        id: prev.length > 0 ? prev[prev.length - 1].id + 1 : 1,
-        barang: barang,
-        qty: 1,
-        diskon_nilai: 0,
-        diskon_pct: 0,
-        harga_diskon: barang.harga,
-        total: barang.harga,
-      };
-
-      return [...prev, productData];
-    });
-  };
-
-  const onDiskonInput = (diskonPct: string, salesId: number) => {
-    let newDiskon = parseInt(diskonPct);
-    if (newDiskon < 0 || newDiskon > 100) return;
-    if (isNaN(newDiskon)) newDiskon = 0;
-
-    setProductData((prev) => {
-      const current = prev.find((item) => item.id === salesId);
-      if (!current) return prev;
-
-      const diskonNilai = (newDiskon / 100) * current.barang.harga;
-      const hargaDiskon = current.barang.harga - diskonNilai;
-      const total = calculatePrice(hargaDiskon, current.qty);
-
-      return prev.map((item) =>
-        item.id === salesId
-          ? {
-              ...item,
-              diskon_pct: newDiskon,
-              diskon_nilai: diskonNilai,
-              harga_diskon: hargaDiskon,
-              total: total,
-            }
-          : item
-      );
-    });
-  };
-
-  const calculatePrice = (price: number, qty: number) => {
-    return price * qty;
-  };
-
-  const onQtyInput = (qty: string, salesId: number) => {
-    let newQty = Number(qty);
-    if (newQty < 0) newQty = 1;
-    if (isNaN(newQty)) newQty = 1;
-
-    setProductData((prev) =>
-      prev.map((item) =>
-        item.id === salesId
-          ? {
-              ...item,
-              qty: newQty,
-              total: calculatePrice(item.harga_diskon, newQty),
-            }
-          : item
-      )
-    );
-  };
-
-  const barangToAdd = dataBarang.filter(
-    (item) => !productData.find((detail) => detail.barang.id === item.id)
-  );
-
-  const formatCurrency = (raw: number) => {
-    return raw.toLocaleString("id-ID", {
-      style: "currency",
-      currency: "IDR",
-    });
-  };
-
-  const calculateTotal = React.useCallback(() => {
-    const salesDiskon = form.watch("diskon");
-    const salesOngkir = form.watch("ongkir");
-    const subtotal = productData.reduce((acc, curr) => acc + curr.total, 0);
-    const totalBayar = subtotal - salesDiskon - salesOngkir;
-
-    return totalBayar;
-  }, [form, productData]);
-
-  const onSubmit = async (data: z.infer<typeof SalesDto>) => {
-    setSubmitting(true);
-    const { salesDetail, subtotal, total_bayar, cust_id, tgl, ...sales } = data;
-
-    if (productData.length < 1) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Barang tidak boleh kosong.",
-      });
-      setSubmitting(false);
-      return;
-    }
-    if (!customerId) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Customer tidak boleh kosong.",
-      });
-      setSubmitting(false);
-      return;
-    }
-    if (!date) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Tanggal transaksi tidak boleh kosong.",
-      });
-      setSubmitting(false);
-      return;
-    }
-
-    if (productData.some((item) => item.qty < 1)) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Kuantitas barang tidak boleh kurang dari 1.",
-      });
-      setSubmitting(false);
-      return;
-    }
-
-    const salesDetailData: typeof salesDetail = productData.map((item) => ({
-      barang_id: item.barang.id,
-      harga_bandrol: item.barang.harga,
-      qty: item.qty,
-      diskon_nilai: item.diskon_nilai,
-      diskon_pct: item.diskon_pct,
-      harga_diskon: item.harga_diskon,
-      total: item.total,
-    }));
-
-    const newSales: typeof data = {
-      ...sales,
-      subtotal: productData.reduce((acc, curr) => acc + curr.total, 0),
-      total_bayar: calculateTotal(),
-      salesDetail: salesDetailData,
-      cust_id: customerId,
-      tgl: date,
-    };
-
-    const response = await createSales(newSales);
-
-    if (response.status === 201) {
-      toast({
-        title: "Data berhasil disimpan",
-        description: response.message.join(", "),
-      });
-      router.refresh();
-      onReset();
-    } else {
-      toast({
-        variant: "destructive",
-        title: "Gagal menyimpan data",
-        description: response.message.join(", "),
-      });
-    }
-
-    setSubmitting(false);
-  };
-
-  const chooseCustomer = (id: number) => {
-    setCustomerId((prev) => (prev === id ? null : id));
-  };
-
-  const onReset = () => {
-    form.reset();
-    setProductData([]);
-    setCustomerId(null);
-    setDate(undefined);
-  };
-
-  const onDeleteDetail = (id: number) => {
-    setProductData((prev) => prev.filter((item) => item.id !== id));
-  };
-
-  const onDateSelect = (date?: Date) => {
-    const selected = format(date ?? new Date(), "Y-MM-dd");
-
-    setDate(selected);
-  };
+  const { form, state } = useSales({ dataBarang });
 
   return (
     <div className="min-h-svh relative">
@@ -270,11 +58,11 @@ export default function FormSales({ dataBarang, dataCustomer }: IFormSales) {
               </PopoverTrigger>
               <PopoverContent>
                 <div className="w-full flex flex-col gap-2">
-                  {barangToAdd.map((barang) => (
+                  {form.barang.map((barang) => (
                     <Button
                       variant="outline"
                       key={barang.id}
-                      onClick={() => addBarang(barang.id)}
+                      onClick={() => form.handler.salesDetail.add(barang.id)}
                       className="justify-start"
                     >
                       <div className="inline-flex items-center gap-2 justify-start">
@@ -298,10 +86,10 @@ export default function FormSales({ dataBarang, dataCustomer }: IFormSales) {
                   {dataCustomer.map((customer) => (
                     <Button
                       variant={
-                        customerId === customer.id ? "default" : "outline"
+                        state.customerId === customer.id ? "default" : "outline"
                       }
                       key={customer.id}
-                      onClick={() => chooseCustomer(customer.id)}
+                      onClick={() => form.handler.chooseCustomer(customer.id)}
                       className="justify-start"
                     >
                       <div className="inline-flex items-center gap-2 justify-start">
@@ -321,12 +109,12 @@ export default function FormSales({ dataBarang, dataCustomer }: IFormSales) {
                 variant={"outline"}
                 className={cn(
                   "w-full md:w-fit justify-center md:justify-start text-center md:text-left font-normal",
-                  !date && "text-muted-foreground"
+                  !state.date && "text-muted-foreground"
                 )}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                {date ? (
-                  format(date, "PPP")
+                {state.date ? (
+                  format(state.date, "PPP")
                 ) : (
                   <span>Pilih Tanggal Transaksi</span>
                 )}
@@ -335,8 +123,8 @@ export default function FormSales({ dataBarang, dataCustomer }: IFormSales) {
             <PopoverContent className="w-auto p-0">
               <Calendar
                 mode="single"
-                selected={date ? new Date(date) : undefined}
-                onSelect={(date) => onDateSelect(date)}
+                selected={state.date ? new Date(state.date) : undefined}
+                onSelect={(date) => form.handler.selectDate(date)}
                 initialFocus
               />
             </PopoverContent>
@@ -383,13 +171,13 @@ export default function FormSales({ dataBarang, dataCustomer }: IFormSales) {
             </TableRow>
           </TableHeader>
           <TableBody className="border">
-            {productData.map((detail, index) => (
+            {form.productData.map((detail, index) => (
               <TableRow key={detail.barang.id}>
                 <TableCell className="text-center border-r">
                   <Button
                     variant="destructive"
                     size="icon"
-                    onClick={() => onDeleteDetail(detail.id)}
+                    onClick={() => form.handler.salesDetail.remove(detail.id)}
                   >
                     <Trash2Icon className="w-4 h-4" />
                   </Button>
@@ -404,7 +192,7 @@ export default function FormSales({ dataBarang, dataCustomer }: IFormSales) {
                   {detail.barang.nama}
                 </TableCell>
                 <TableCell className="text-center border-r">
-                  {formatCurrency(detail.barang.harga)}
+                  {form.handler.formatCurrency(detail.barang.harga)}
                 </TableCell>
                 <TableCell className="text-center border-r">
                   <Input
@@ -413,7 +201,12 @@ export default function FormSales({ dataBarang, dataCustomer }: IFormSales) {
                     max={100}
                     value={detail.qty}
                     className="min-w-[8ch] max-w-[8ch] text-center mx-auto"
-                    onChange={(e) => onQtyInput(e.target.value, detail.id)}
+                    onChange={(e) =>
+                      form.handler.salesDetail.quantityInput(
+                        e.target.value,
+                        detail.id
+                      )
+                    }
                   />
                 </TableCell>
                 <TableCell className="text-center border-r">
@@ -428,21 +221,26 @@ export default function FormSales({ dataBarang, dataCustomer }: IFormSales) {
                           : detail.diskon_pct
                       }
                       className="min-w-[8ch] max-w-[8ch] text-center"
-                      onChange={(e) => onDiskonInput(e.target.value, detail.id)}
+                      onChange={(e) =>
+                        form.handler.salesDetail.discountInput(
+                          e.target.value,
+                          detail.id
+                        )
+                      }
                     />
                     <span className="text-xs">%</span>
                   </div>
                 </TableCell>
                 <TableCell className="text-center border-r">
                   {detail.diskon_nilai > 0
-                    ? formatCurrency(detail.diskon_nilai)
+                    ? form.handler.formatCurrency(detail.diskon_nilai)
                     : "-"}
                 </TableCell>
                 <TableCell className="text-center border-r">
-                  {formatCurrency(detail.harga_diskon)}
+                  {form.handler.formatCurrency(detail.harga_diskon)}
                 </TableCell>
                 <TableCell className="text-center">
-                  {formatCurrency(detail.total)}
+                  {form.handler.formatCurrency(detail.total)}
                 </TableCell>
               </TableRow>
             ))}
@@ -450,24 +248,24 @@ export default function FormSales({ dataBarang, dataCustomer }: IFormSales) {
         </Table>
       </div>
 
-      {productData.length > 0 && (
-        <Form {...form}>
+      {form.productData.length > 0 && (
+        <Form {...form.form}>
           <form
-            onSubmit={form.handleSubmit(onSubmit)}
+            onSubmit={form.form.handleSubmit(form.handler.submit)}
             className="w-full grid grid-cols-6 gap-4 px-4 md:px-8 py-2 bg-white z-50 fixed bottom-0 text-xs md:text-sm border-t"
           >
             <div className="col-span-4 md:col-span-5 flex flex-col gap-px justify-self-start">
               <div className="w-full grid grid-cols-2">
                 <b className="self-center">Sub total</b>
                 <span className="justify-self-end">
-                  {formatCurrency(productData.reduce((a, b) => a + b.total, 0))}
+                  {form.handler.formatCurrency(state.subtotal)}
                 </span>
               </div>
 
               <div className="w-full grid grid-cols-2">
                 <b className="self-center">Diskon</b>
                 <CurrencyInput
-                  form={form}
+                  form={form.form}
                   name="diskon"
                   label=""
                   placeholder="Rp. 0"
@@ -494,7 +292,7 @@ export default function FormSales({ dataBarang, dataCustomer }: IFormSales) {
                   </Popover>
                 </div>
                 <CurrencyInput
-                  form={form}
+                  form={form.form}
                   name="ongkir"
                   label=""
                   placeholder="Rp. 0"
@@ -505,18 +303,28 @@ export default function FormSales({ dataBarang, dataCustomer }: IFormSales) {
               <div className="w-full grid grid-cols-2">
                 <b className="self-center">Total Bayar</b>
                 <span className="justify-self-end">
-                  {formatCurrency(calculateTotal())}
+                  {form.handler.formatCurrency(state.total)}
                 </span>
               </div>
             </div>
 
             <div className="col-span-2 md:col-span-1 flex flex-col gap-2 self-center">
-              <Button type="submit" variant="default" disabled={submitting}>
-                {submitting && <Loader2Icon className="w-4 h-4 animate-spin" />}
+              <Button
+                type="submit"
+                variant="default"
+                disabled={state.submitting}
+              >
+                {state.submitting && (
+                  <Loader2Icon className="w-4 h-4 animate-spin" />
+                )}
                 <span>Simpan</span>
               </Button>
               <AlertDialog>
-                <Button variant="destructive" asChild disabled={submitting}>
+                <Button
+                  variant="destructive"
+                  asChild
+                  disabled={state.submitting}
+                >
                   <AlertDialogTrigger>
                     <span>Batal</span>
                   </AlertDialogTrigger>
@@ -536,7 +344,7 @@ export default function FormSales({ dataBarang, dataCustomer }: IFormSales) {
                   <AlertDialogFooter>
                     <AlertDialogCancel>Tidak</AlertDialogCancel>
                     <Button variant="destructive" asChild>
-                      <AlertDialogAction onClick={onReset}>
+                      <AlertDialogAction onClick={form.handler.resetForm}>
                         Ya
                       </AlertDialogAction>
                     </Button>
