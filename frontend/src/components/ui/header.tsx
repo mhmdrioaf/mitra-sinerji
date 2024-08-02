@@ -18,7 +18,7 @@ export default function Header() {
   const isActive = (currentPath: string) => pathname === currentPath;
 
   return (
-    <header className="w-full px-4 md:px-8 py-2 sticky top-0 left-0 justify-between inline-flex items-center bg-white/30 backdrop-blur-sm border-b border-b-input z-50">
+    <header className="w-full px-4 md:px-8 py-2 sticky top-0 left-0 justify-between inline-flex items-center bg-white/70 backdrop-blur-md border-b border-b-input z-50">
       <Link href="/" className="flex flex-col gap-px">
         <h1 className="text-lg md:text-xl font-bold">
           PT. Mitra Sinerji Teknoindo
@@ -40,21 +40,23 @@ export default function Header() {
                 <DrawerTitle>Menu</DrawerTitle>
                 <DrawerDescription>Navigasi Fitur</DrawerDescription>
               </DrawerHeader>
-              <Button asChild variant={isActive("/") ? "default" : "outline"}>
-                <Link href="/">Beranda</Link>
-              </Button>
-              <Button
-                asChild
-                variant={isActive("/barang") ? "default" : "outline"}
-              >
-                <Link href="/barang">Data Barang</Link>
-              </Button>
-              <Button
-                asChild
-                variant={isActive("/customer") ? "default" : "outline"}
-              >
-                <Link href="/customer">Data Customer</Link>
-              </Button>
+              <div className="w-full flex flex-col gap-2 px-4 pb-2">
+                <Button asChild variant={isActive("/") ? "default" : "ghost"}>
+                  <Link href="/">Beranda</Link>
+                </Button>
+                <Button
+                  asChild
+                  variant={isActive("/barang") ? "default" : "ghost"}
+                >
+                  <Link href="/barang">Data Barang</Link>
+                </Button>
+                <Button
+                  asChild
+                  variant={isActive("/customer") ? "default" : "ghost"}
+                >
+                  <Link href="/customer">Data Customer</Link>
+                </Button>
+              </div>
             </DrawerContent>
           </Drawer>
         </div>
