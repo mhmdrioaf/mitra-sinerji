@@ -1,4 +1,6 @@
 import { Barang } from '@prisma/client';
+import { Transform } from 'class-transformer';
+import { IsNumberString } from 'class-validator';
 
 export type TDeleteBarangResponse = {
   status: number;
@@ -22,3 +24,17 @@ export type TCreateBarangResponse = {
 };
 
 export type TUpdateBarangResponse = TCreateBarangResponse;
+
+export class BarangEntity implements Omit<Barang, 'harga'> {
+  id: number;
+  nama: string;
+  kode: string;
+
+  @IsNumberString()
+  @Transform(({ value }) => Number(value))
+  harga: number;
+
+  constructor(barang: Barang) {
+    Object.assign(this, barang);
+  }
+}

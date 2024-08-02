@@ -119,6 +119,12 @@ export class SalesService {
               barang: true,
             },
           },
+
+          cust: {
+            select: {
+              name: true,
+            },
+          },
         },
       });
 
