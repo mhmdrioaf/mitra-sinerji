@@ -27,6 +27,7 @@ import { Calendar } from "../calendar";
 import { Form } from "../form";
 import { Input } from "../input";
 import { Popover, PopoverContent, PopoverTrigger } from "../popover";
+import { ScrollArea } from "../scroll-area";
 import {
   Table,
   TableBody,
@@ -65,19 +66,25 @@ export default function FormSales({ dataBarang, dataCustomer }: IFormSales) {
                     }
                     placeholder="Cari berdasarkan nama atau kode"
                   />
-                  {form.barang.map((barang) => (
-                    <Button
-                      variant="outline"
-                      key={barang.id}
-                      onClick={() => form.handler.salesDetail.add(barang.id)}
-                      className="justify-start"
-                    >
-                      <div className="inline-flex items-center gap-2 justify-start">
-                        <span>{barang.kode}</span>
-                        <span>{barang.nama}</span>
-                      </div>
-                    </Button>
-                  ))}
+                  <ScrollArea className="w-full h-[24svh]">
+                    <div className="w-full flex flex-col gap-2">
+                      {form.barang.map((barang) => (
+                        <Button
+                          variant="outline"
+                          key={barang.id}
+                          onClick={() =>
+                            form.handler.salesDetail.add(barang.id)
+                          }
+                          className="justify-start w-full"
+                        >
+                          <div className="inline-flex items-center gap-2 justify-start">
+                            <span>{barang.kode}</span>
+                            <span>{barang.nama}</span>
+                          </div>
+                        </Button>
+                      ))}
+                    </div>
+                  </ScrollArea>
                 </div>
               </PopoverContent>
             </Popover>
@@ -97,21 +104,29 @@ export default function FormSales({ dataBarang, dataCustomer }: IFormSales) {
                     }
                     placeholder="Cari berdasarkan nama atau kode"
                   />
-                  {form.customer.map((customer) => (
-                    <Button
-                      variant={
-                        state.customerId === customer.id ? "default" : "outline"
-                      }
-                      key={customer.id}
-                      onClick={() => form.handler.chooseCustomer(customer.id)}
-                      className="justify-start"
-                    >
-                      <div className="inline-flex items-center gap-2 justify-start">
-                        <span>{customer.kode}</span>
-                        <span>{customer.name}</span>
-                      </div>
-                    </Button>
-                  ))}
+                  <ScrollArea className="w-full h-[24svh]">
+                    <div className="w-full flex flex-col gap-2">
+                      {form.customer.map((customer) => (
+                        <Button
+                          variant={
+                            state.customerId === customer.id
+                              ? "default"
+                              : "outline"
+                          }
+                          key={customer.id}
+                          onClick={() =>
+                            form.handler.chooseCustomer(customer.id)
+                          }
+                          className="justify-start"
+                        >
+                          <div className="inline-flex items-center gap-2 justify-start">
+                            <span>{customer.kode}</span>
+                            <span>{customer.name}</span>
+                          </div>
+                        </Button>
+                      ))}
+                    </div>
+                  </ScrollArea>
                 </div>
               </PopoverContent>
             </Popover>
