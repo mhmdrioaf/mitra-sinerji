@@ -1,6 +1,5 @@
 "use client";
 
-import { TSales } from "@/lib/api/sales/definitions";
 import useSalesData from "@/lib/hooks/useSalesData";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
@@ -22,10 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from "../table";
-
-interface ITableSalesProps {
-  data: TSales[];
-}
+import TableSkeleton from "./TableSkeleton";
 
 interface ISortableTableHeaderProps {
   onClick: () => void;
@@ -63,8 +59,8 @@ function SortIcon({
   ) : null;
 }
 
-export default function TableSales({ data }: ITableSalesProps) {
-  const sales = useSalesData({ salesData: data });
+export default function TableSales() {
+  const sales = useSalesData();
 
   return (
     <div className="w-full flex flex-col gap-4">
@@ -220,48 +216,71 @@ export default function TableSales({ data }: ITableSalesProps) {
             </SortableTableHeader>
           </TableRow>
         </TableHeader>
+
         <TableBody className="border">
-          {sales.state.data.length < 1 ? (
+          {!sales.state.isLoading && !sales.state.error ? (
+            sales.state.data.length < 1 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={9}
+                  className="text-center text-sm text-neutral-600"
+                >
+                  Belum ada data transaksi...
+                </TableCell>
+              </TableRow>
+            ) : (
+              sales.state.data.map((sale, index) => (
+                <TableRow key={sale.id}>
+                  <TableCell className="text-center border-r">
+                    {index + 1}.
+                  </TableCell>
+                  <TableCell className="text-center border-r">
+                    {sale.kode}
+                  </TableCell>
+                  <TableCell className="text-center border-r">
+                    {format(sale.tgl, "dd-MMM-y")}
+                  </TableCell>
+                  <TableCell className="text-left border-r">
+                    {sale.cust.name}
+                  </TableCell>
+                  <TableCell className="text-right border-r">
+                    {sales.handler.calculateTotalBarang(sale)}
+                  </TableCell>
+                  <TableCell className="text-center border-r">
+                    {sales.handler.formatCurrency(sale.subtotal)}
+                  </TableCell>
+                  <TableCell className="text-center border-r">
+                    {sales.handler.formatCurrency(sale.diskon)}
+                  </TableCell>
+                  <TableCell className="text-center border-r">
+                    {sales.handler.formatCurrency(sale.ongkir)}
+                  </TableCell>
+                  <TableCell className="text-center border-r">
+                    {sales.handler.formatCurrency(sale.total_bayar)}
+                  </TableCell>
+                </TableRow>
+              ))
+            )
+          ) : sales.state.isLoading ? (
+            <TableSkeleton rows={9} />
+          ) : sales.state.error ? (
             <TableRow>
               <TableCell
                 colSpan={9}
                 className="text-center text-sm text-neutral-600"
               >
-                Belum ada data transaksi...
+                Terjadi kesalahan saat memuat data transaksi...
               </TableCell>
             </TableRow>
           ) : (
-            sales.state.data.map((sale, index) => (
-              <TableRow key={sale.id}>
-                <TableCell className="text-center border-r">
-                  {index + 1}.
-                </TableCell>
-                <TableCell className="text-center border-r">
-                  {sale.kode}
-                </TableCell>
-                <TableCell className="text-center border-r">
-                  {format(sale.tgl, "dd-MMM-y")}
-                </TableCell>
-                <TableCell className="text-left border-r">
-                  {sale.cust.name}
-                </TableCell>
-                <TableCell className="text-right border-r">
-                  {sales.handler.calculateTotalBarang(sale)}
-                </TableCell>
-                <TableCell className="text-center border-r">
-                  {sales.handler.formatCurrency(sale.subtotal)}
-                </TableCell>
-                <TableCell className="text-center border-r">
-                  {sales.handler.formatCurrency(sale.diskon)}
-                </TableCell>
-                <TableCell className="text-center border-r">
-                  {sales.handler.formatCurrency(sale.ongkir)}
-                </TableCell>
-                <TableCell className="text-center border-r">
-                  {sales.handler.formatCurrency(sale.total_bayar)}
-                </TableCell>
-              </TableRow>
-            ))
+            <TableRow>
+              <TableCell
+                colSpan={9}
+                className="text-center text-sm text-neutral-600"
+              >
+                Terjadi kesalahan saat memuat data transaksi...
+              </TableCell>
+            </TableRow>
           )}
         </TableBody>
 
