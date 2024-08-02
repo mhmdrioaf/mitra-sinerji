@@ -17,6 +17,7 @@ import {
   TableBody,
   TableCaption,
   TableCell,
+  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -220,7 +221,7 @@ export default function TableSales({ data }: ITableSalesProps) {
           </TableRow>
         </TableHeader>
         <TableBody className="border">
-          {sales.state.data.length < 0 ? (
+          {sales.state.data.length < 1 ? (
             <TableRow>
               <TableCell
                 colSpan={9}
@@ -230,51 +231,57 @@ export default function TableSales({ data }: ITableSalesProps) {
               </TableCell>
             </TableRow>
           ) : (
-            <>
-              {sales.state.data.map((sale, index) => (
-                <TableRow key={sale.id}>
-                  <TableCell className="text-center border-r">
-                    {index + 1}.
-                  </TableCell>
-                  <TableCell className="text-center border-r">
-                    {sale.kode}
-                  </TableCell>
-                  <TableCell className="text-center border-r">
-                    {format(sale.tgl, "dd-MMM-y")}
-                  </TableCell>
-                  <TableCell className="text-left border-r">
-                    {sale.cust.name}
-                  </TableCell>
-                  <TableCell className="text-right border-r">
-                    {sales.handler.calculateTotalBarang(sale)}
-                  </TableCell>
-                  <TableCell className="text-center border-r">
-                    {sales.handler.formatCurrency(sale.subtotal)}
-                  </TableCell>
-                  <TableCell className="text-center border-r">
-                    {sales.handler.formatCurrency(sale.diskon)}
-                  </TableCell>
-                  <TableCell className="text-center border-r">
-                    {sales.handler.formatCurrency(sale.ongkir)}
-                  </TableCell>
-                  <TableCell className="text-center border-r">
-                    {sales.handler.formatCurrency(sale.total_bayar)}
-                  </TableCell>
-                </TableRow>
-              ))}
-
-              <TableRow className="bg-neutral-700 text-neutral-200">
-                <TableCell colSpan={4} />
-                <TableCell colSpan={4} className="text-center font-bold">
-                  Grand Total
+            sales.state.data.map((sale, index) => (
+              <TableRow key={sale.id}>
+                <TableCell className="text-center border-r">
+                  {index + 1}.
                 </TableCell>
-                <TableCell className="text-center font-bold">
-                  {sales.handler.formatCurrency(sales.state.grandTotal)}
+                <TableCell className="text-center border-r">
+                  {sale.kode}
+                </TableCell>
+                <TableCell className="text-center border-r">
+                  {format(sale.tgl, "dd-MMM-y")}
+                </TableCell>
+                <TableCell className="text-left border-r">
+                  {sale.cust.name}
+                </TableCell>
+                <TableCell className="text-right border-r">
+                  {sales.handler.calculateTotalBarang(sale)}
+                </TableCell>
+                <TableCell className="text-center border-r">
+                  {sales.handler.formatCurrency(sale.subtotal)}
+                </TableCell>
+                <TableCell className="text-center border-r">
+                  {sales.handler.formatCurrency(sale.diskon)}
+                </TableCell>
+                <TableCell className="text-center border-r">
+                  {sales.handler.formatCurrency(sale.ongkir)}
+                </TableCell>
+                <TableCell className="text-center border-r">
+                  {sales.handler.formatCurrency(sale.total_bayar)}
                 </TableCell>
               </TableRow>
-            </>
+            ))
           )}
         </TableBody>
+
+        <TableFooter>
+          <TableRow className="bg-neutral-950 text-neutral-200 hover:bg-neutral-950">
+            <TableCell />
+            <TableCell className="border-r border-r-neutral-600" />
+            <TableCell className="border-r border-r-neutral-600" />
+            <TableCell className="border-r border-r-neutral-600" />
+            <TableCell
+              colSpan={4}
+              className="text-center font-bold border-r border-r-neutral-600"
+            >
+              Grand Total
+            </TableCell>
+            <TableCell className="text-center font-bold">
+              {sales.handler.formatCurrency(sales.state.grandTotal)}
+            </TableCell>
+          </TableRow>
+        </TableFooter>
       </Table>
     </div>
   );
