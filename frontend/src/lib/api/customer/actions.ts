@@ -1,6 +1,7 @@
 "use server";
 
 import { ApiEndpoint } from "@/lib/constants";
+import { revalidatePath } from "next/cache";
 import * as z from "zod";
 import {
   CustomerDto,
@@ -20,6 +21,9 @@ export async function createCustomer(
   });
 
   const response: TCreateCustomerApiResponse = await res.json();
+  if (response.status === 200 || response.status === 201) {
+    revalidatePath("/", "layout");
+  }
   return response;
 }
 
@@ -36,6 +40,9 @@ export async function updateCustomer(
   });
 
   const response: TCreateCustomerApiResponse = await res.json();
+  if (response.status === 200 || response.status === 201) {
+    revalidatePath("/", "layout");
+  }
   return response;
 }
 
@@ -47,5 +54,8 @@ export async function deleteCustomer(
   });
 
   const response: TDeleteCustomerApiResponse = await res.json();
+  if (response.status === 200 || response.status === 201) {
+    revalidatePath("/", "layout");
+  }
   return response;
 }
