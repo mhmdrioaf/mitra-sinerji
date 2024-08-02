@@ -125,6 +125,9 @@ export default function FormSales({ dataBarang, dataCustomer }: IFormSales) {
                 mode="single"
                 selected={state.date ? new Date(state.date) : undefined}
                 onSelect={(date) => form.handler.selectDate(date)}
+                disabled={(date) =>
+                  date > new Date() || date < new Date("1900-01-01")
+                }
                 initialFocus
               />
             </PopoverContent>
