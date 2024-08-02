@@ -14,10 +14,10 @@ datasource db {
 }
 
 model Barang {
-  id    Int    @id @default(autoincrement())
-  kode  String @unique @db.VarChar(10)
-  nama  String @db.VarChar(100)
-  harga Int
+  id    Int     @id @default(autoincrement())
+  kode  String  @unique @db.VarChar(10)
+  nama  String  @db.VarChar(100)
+  harga Decimal
 
   sales_detail SalesDetail[]
 }
@@ -35,10 +35,10 @@ model Sales {
   id          Int      @id @default(autoincrement())
   kode        String   @unique @db.VarChar(15)
   tgl         DateTime @default(now())
-  subtotal    Int
-  diskon      Int
-  ongkir      Int
-  total_bayar Int
+  subtotal    Decimal
+  diskon      Decimal
+  ongkir      Decimal
+  total_bayar Decimal
 
   sales_detail SalesDetail[]
 
@@ -47,15 +47,15 @@ model Sales {
 }
 
 model SalesDetail {
-  id            Int @id @default(autoincrement())
+  id            Int     @id @default(autoincrement())
   sales_id      Int
   barang_id     Int
-  harga_bandrol Int
+  harga_bandrol Decimal
   qty           Int
-  diskon_pct    Int
-  diskon_nilai  Int
-  harga_diskon  Int
-  total         Int
+  diskon_pct    Decimal
+  diskon_nilai  Decimal
+  harga_diskon  Decimal
+  total         Decimal
 
   sales  Sales  @relation(fields: [sales_id], references: [id], onDelete: Cascade)
   barang Barang @relation(fields: [barang_id], references: [id], onDelete: Cascade)
