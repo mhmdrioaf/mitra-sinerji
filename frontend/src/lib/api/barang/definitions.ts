@@ -38,8 +38,8 @@ export enum FormBarangAction {
 export const BarangDto = z.object({
   kode: z
     .string()
-    .min(1, "Kode barang tidak boleh kosong")
-    .max(10, "Kode barang tidak bolen lebih dari 10 karakter"),
+    .max(10, "Kode barang tidak bolen lebih dari 10 karakter")
+    .optional(),
   nama: z
     .string()
     .min(1, "Nama barang tidak boleh kosong")

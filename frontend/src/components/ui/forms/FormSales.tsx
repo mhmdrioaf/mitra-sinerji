@@ -178,7 +178,16 @@ export default function FormSales({ dataBarang, dataCustomer }: IFormSales) {
               Belum ada barang yang di input
             </span>
 
-            <Button variant="outline">Tambahkan Barang</Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                if (refs.barang.current) {
+                  refs.barang.current.click();
+                }
+              }}
+            >
+              Tambahkan Barang
+            </Button>
           </div>
         ) : (
           <Table>
