@@ -42,7 +42,7 @@ export default function Header() {
               </DrawerHeader>
               <div className="w-full flex flex-col gap-2 px-4 pb-2">
                 <Button asChild variant={isActive("/") ? "default" : "ghost"}>
-                  <Link href="/">Beranda</Link>
+                  <Link href="/">Dashboard</Link>
                 </Button>
                 <Button asChild variant={isActive("/") ? "default" : "ghost"}>
                   <Link href="/sales">Data Transaksi</Link>
@@ -66,7 +66,7 @@ export default function Header() {
 
         <div className="hidden md:inline-flex gap-4">
           <Button asChild variant={isActive("/") ? "default" : "link"}>
-            <Link href="/">Beranda</Link>
+            <Link href="/">Dashboard</Link>
           </Button>
           <Button asChild variant={isActive("/sales") ? "default" : "link"}>
             <Link href="/sales">Data Transaksi</Link>
