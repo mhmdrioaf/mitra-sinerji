@@ -6,6 +6,7 @@ import {
   FormCustomerAction,
   TCustomer,
 } from "@/lib/api/customer/definitions";
+import { properizeWord } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -77,7 +78,16 @@ export default function FormCustomer({
   const onSubmit = async (data: z.infer<typeof CustomerDto>) => {
     setSubmitting(true);
 
-    const response = await submitHandler(data);
+    const { kode, name, ...rest } = data;
+
+    const properizedKode = kode?.toUpperCase();
+    const properizedName = properizeWord(name);
+
+    const response = await submitHandler({
+      kode: properizedKode,
+      name: properizedName,
+      ...rest,
+    });
 
     if (response.status === 201 || response.status === 200) {
       form.reset();
