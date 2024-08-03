@@ -3,7 +3,7 @@
 import { ChartConfig } from "@/components/ui/chart";
 import { useQuery } from "@tanstack/react-query";
 import { listSales } from "../api/sales/fetcher";
-import { getRandomColors } from "../utils";
+import { getRandomNumber } from "../utils";
 
 export default function useChart() {
   const query = useQuery({ queryKey: ["sales"], queryFn: listSales });
@@ -124,7 +124,7 @@ export default function useChart() {
     if (!chartConfig[year]) {
       chartConfig[year] = {
         label: year.toString(),
-        color: getRandomColors(),
+        color: `hsl(31, 31%, ${getRandomNumber(26, 50)}%)`,
       };
     }
   });

@@ -285,18 +285,18 @@ export default function TableSales() {
         </TableBody>
 
         <TableFooter>
-          <TableRow className="bg-neutral-950 text-neutral-200 hover:bg-neutral-950">
+          <TableRow className="bg-primary hover:bg-primary">
             <TableCell />
-            <TableCell className="border-r border-r-neutral-600" />
-            <TableCell className="border-r border-r-neutral-600" />
-            <TableCell className="border-r border-r-neutral-600" />
+            <TableCell className="border-r" />
+            <TableCell className="border-r" />
+            <TableCell className="border-r" />
             <TableCell
               colSpan={4}
-              className="text-center font-bold border-r border-r-neutral-600"
+              className="text-center font-bold border-r text-primary-foreground"
             >
               Grand Total
             </TableCell>
-            <TableCell className="text-center font-bold">
+            <TableCell className="text-center font-bold text-primary-foreground">
               {sales.handler.formatCurrency(sales.state.grandTotal)}
             </TableCell>
           </TableRow>

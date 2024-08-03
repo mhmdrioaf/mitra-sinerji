@@ -1,6 +1,6 @@
 "use client";
 
-import { MenuIcon } from "lucide-react";
+import { MenuIcon, SquareChartGanttIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "./button";
@@ -18,12 +18,10 @@ export default function Header() {
   const isActive = (currentPath: string) => pathname === currentPath;
 
   return (
-    <header className="w-full px-4 md:px-8 py-2 sticky top-0 left-0 justify-between inline-flex items-center bg-white/70 backdrop-blur-md border-b border-b-input z-50">
-      <Link href="/" className="flex flex-col gap-px">
-        <h1 className="text-lg md:text-xl font-bold">
-          PT. Mitra Sinerji Teknoindo
-        </h1>
-        <p className="text-xs text-neutral-600">Fullstack Test</p>
+    <header className="w-full px-4 md:px-8 py-2 sticky top-0 left-0 justify-between inline-flex items-center bg-background/70 backdrop-blur-md border-b border-b-input z-50">
+      <Link href="/" className="inline-flex items-center gap-2 text-primary">
+        <SquareChartGanttIcon className="w-6 h-6" />
+        <p className="text-lg font-bold">Klyvo.</p>
       </Link>
 
       <nav>
@@ -44,7 +42,10 @@ export default function Header() {
                 <Button asChild variant={isActive("/") ? "default" : "ghost"}>
                   <Link href="/">Dashboard</Link>
                 </Button>
-                <Button asChild variant={isActive("/") ? "default" : "ghost"}>
+                <Button
+                  asChild
+                  variant={isActive("/sales") ? "default" : "ghost"}
+                >
                   <Link href="/sales">Data Transaksi</Link>
                 </Button>
                 <Button

@@ -1,6 +1,6 @@
 "use client";
 
-import { LoaderCircleIcon } from "lucide-react";
+import { SquareChartGantt } from "lucide-react";
 import React from "react";
 
 export default function Loading() {
@@ -13,14 +13,11 @@ export default function Loading() {
   });
 
   return (
-    <div className="w-full h-svh fixed bg-white z-[60] top-0 left-0 flex flex-col gap-2 items-center justify-center text-neutral-900">
-      <LoaderCircleIcon className="w-5 h-5 animate-spin" />
-      <b className="mt-2 text-center text-lg md:text-xl animate-bounce">
-        Harap tunggu
-      </b>
-      <p className="text-center text-sm animate-bounce delay-75">
-        Sedang menyiapkan data
-      </p>
+    <div className="w-full h-svh fixed bg-background z-[60] top-0 left-0 grid place-items-center">
+      <div className="flex flex-col gap-2 items-center justify-center text-primary animate-pulse">
+        <SquareChartGantt className="w-6 h-6 animate-bounce delay-0" />
+        <p className="font-medium animate-bounce delay-100">Klyvo.</p>
+      </div>
     </div>
   );
 }
