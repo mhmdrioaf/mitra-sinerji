@@ -1,13 +1,16 @@
 "use client";
 
 import { useToast } from "@/components/ui/use-toast";
+import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { useForm, UseFormReturn } from "react-hook-form";
 import * as z from "zod";
 import { TBarang } from "../api/barang/definitions";
+import { listBarang } from "../api/barang/fetcher";
 import { TCustomer } from "../api/customer/definitions";
+import { listCustomer } from "../api/customer/fetcher";
 import { createSales } from "../api/sales/actions";
 import { SalesDto, TSalesDetail } from "../api/sales/definitions";
 
@@ -57,13 +60,7 @@ export type TSearch = {
   barang: string;
 };
 
-export function useSales({
-  dataBarang,
-  dataCustomer,
-}: {
-  dataBarang?: TBarang[];
-  dataCustomer: TCustomer[];
-}): TSalesHook {
+export function useSales(): TSalesHook {
   const [productData, setProductData] = React.useState<TSalesDetail[]>([]);
   const [customerId, setCustomerId] = React.useState<number | null>(null);
   const [submitting, setSubmitting] = React.useState<boolean>(false);
@@ -72,6 +69,18 @@ export function useSales({
     barang: "",
     customer: "",
   });
+
+  const { data: barang } = useQuery({
+    queryKey: ["barang"],
+    queryFn: listBarang,
+  });
+  const { data: customer } = useQuery({
+    queryKey: ["customer"],
+    queryFn: listCustomer,
+  });
+
+  const dataBarang = barang?.data;
+  const dataCustomer = customer?.data || [];
 
   const { toast } = useToast();
   const router = useRouter();

@@ -1,7 +1,5 @@
 "use client";
 
-import { TBarang } from "@/lib/api/barang/definitions";
-import { TCustomer } from "@/lib/api/customer/definitions";
 import { useSales } from "@/lib/hooks/useSales";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
@@ -38,13 +36,8 @@ import {
 } from "../table";
 import CurrencyInput from "./CurrencyInput";
 
-interface IFormSales {
-  dataBarang: TBarang[];
-  dataCustomer: TCustomer[];
-}
-
-export default function FormSales({ dataBarang, dataCustomer }: IFormSales) {
-  const { form, state, refs } = useSales({ dataBarang, dataCustomer });
+export default function FormSales() {
+  const { form, state, refs } = useSales();
 
   return (
     <div className="min-h-svh relative">
