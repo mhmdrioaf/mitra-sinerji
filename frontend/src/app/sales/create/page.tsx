@@ -1,15 +1,10 @@
 import FormSales from "@/components/ui/forms/FormSales";
-import { listBarang } from "@/lib/api/barang/fetcher";
-import { listCustomer } from "@/lib/api/customer/fetcher";
+import { QueryProvider } from "@/components/ui/QueryProvider";
 
-export default async function SalesCreatePage() {
-  const dataBarang = listBarang();
-  const dataCustomer = listCustomer();
-
-  const [barang, customer] = await Promise.all([dataBarang, dataCustomer]);
+export default function SalesCreatePage() {
   return (
-    <div>
-      <FormSales dataBarang={barang.data} dataCustomer={customer.data} />
-    </div>
+    <QueryProvider>
+      <FormSales />
+    </QueryProvider>
   );
 }
