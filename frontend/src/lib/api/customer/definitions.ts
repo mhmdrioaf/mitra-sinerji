@@ -40,10 +40,10 @@ export const CustomerDto = z.object({
     .max(100, "Nama customer tidak boleh lebih dari 100 karakter"),
   kode: z
     .string()
-    .min(1, "Kode customer tidak boleh kosong")
-    .max(10, "Kode customer tidak boleh lebih dari 10 karakter"),
+    .max(10, "Kode customer tidak boleh lebih dari 10 karakter")
+    .optional(),
   telp: z
     .string()
-    .min(1, "Nomor telepon tidak boleh kosong")
+    .min(7, "Nomor telepon tidak boleh kosong")
     .max(20, "Nomor telepon tidak boleh lebih dari 20 karakter"),
 });

@@ -6,6 +6,7 @@ import {
   FormBarangAction,
   TBarang,
 } from "@/lib/api/barang/definitions";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
@@ -13,7 +14,14 @@ import { useForm } from "react-hook-form";
 import { twMerge } from "tailwind-merge";
 import * as z from "zod";
 import { Button } from "../button";
-import { Form, FormControl, FormField, FormItem, FormLabel } from "../form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../form";
 import { Input } from "../input";
 import { useToast } from "../use-toast";
 import CurrencyInput from "./CurrencyInput";
@@ -54,6 +62,7 @@ export default function FormBarang({
   const router = useRouter();
 
   const form = useForm<z.infer<typeof BarangDto>>({
+    resolver: zodResolver(BarangDto),
     defaultValues:
       action === FormBarangAction.Update ? defaultValues : initialFormValues,
   });
@@ -112,8 +121,13 @@ export default function FormBarang({
             <FormItem>
               <FormLabel>Kode Barang</FormLabel>
               <FormControl>
-                <Input placeholder="A001" {...field} />
+                <Input
+                  placeholder="A001"
+                  required={action === FormBarangAction.Create}
+                  {...field}
+                />
               </FormControl>
+              <FormMessage />
             </FormItem>
           )}
         />
@@ -126,6 +140,7 @@ export default function FormBarang({
               <FormControl>
                 <Input placeholder="Barang A" {...field} />
               </FormControl>
+              <FormMessage />
             </FormItem>
           )}
         />

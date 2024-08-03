@@ -6,6 +6,7 @@ import {
   FormCustomerAction,
   TCustomer,
 } from "@/lib/api/customer/definitions";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
@@ -13,7 +14,14 @@ import { useForm } from "react-hook-form";
 import { twMerge } from "tailwind-merge";
 import * as z from "zod";
 import { Button } from "../button";
-import { Form, FormControl, FormField, FormItem, FormLabel } from "../form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../form";
 import { Input } from "../input";
 import { useToast } from "../use-toast";
 import DeleteCustomer from "./DeleteCustomer";
@@ -52,6 +60,7 @@ export default function FormCustomer({
   const router = useRouter();
 
   const form = useForm<z.infer<typeof CustomerDto>>({
+    resolver: zodResolver(CustomerDto),
     defaultValues:
       action === FormCustomerAction.Update ? defaultValues : initialFormValues,
   });
@@ -110,8 +119,13 @@ export default function FormCustomer({
             <FormItem>
               <FormLabel>Kode Customer</FormLabel>
               <FormControl>
-                <Input placeholder="C001" {...field} />
+                <Input
+                  placeholder="C001"
+                  required={action === FormCustomerAction.Create}
+                  {...field}
+                />
               </FormControl>
+              <FormMessage />
             </FormItem>
           )}
         />
@@ -124,6 +138,7 @@ export default function FormCustomer({
               <FormControl>
                 <Input placeholder="Customer A" {...field} />
               </FormControl>
+              <FormMessage />
             </FormItem>
           )}
         />
@@ -134,8 +149,9 @@ export default function FormCustomer({
             <FormItem>
               <FormLabel>Nomor Telepon Customer</FormLabel>
               <FormControl>
-                <Input placeholder="62xxxx" {...field} />
+                <Input placeholder="62xxxx" inputMode="numeric" {...field} />
               </FormControl>
+              <FormMessage />
             </FormItem>
           )}
         />

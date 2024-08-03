@@ -60,6 +60,7 @@ export default function CurrencyInput(props: TextInputProps) {
             <FormControl>
               <Input
                 placeholder={props.placeholder}
+                inputMode="numeric"
                 type="text"
                 {...field}
                 onChange={(ev) => {
