@@ -263,7 +263,7 @@ export function useSales({
         title: "Data berhasil disimpan",
         description: response.message.join(", "),
       });
-      router.refresh();
+      router.replace("/sales");
       onReset();
     } else {
       toast({

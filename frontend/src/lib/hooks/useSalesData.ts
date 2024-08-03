@@ -1,9 +1,11 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import React from "react";
 import { DateRange } from "react-day-picker";
 import { TSales } from "../api/sales/definitions";
+import { listSales } from "../api/sales/fetcher";
 
 export type TSalesDataHook = {
   state: {
@@ -11,6 +13,9 @@ export type TSalesDataHook = {
     currentSort: TSalesSortOptions;
     dates: DateRange | undefined;
     grandTotal: number;
+
+    isLoading: boolean;
+    error: Error | null;
   };
 
   handler: {
@@ -27,11 +32,7 @@ export type TSalesSortOptions = {
   order: "asc" | "desc";
 };
 
-export default function useSalesData({
-  salesData,
-}: {
-  salesData: TSales[];
-}): TSalesDataHook {
+export default function useSalesData(): TSalesDataHook {
   const [search, setSearch] = React.useState<string>("");
   const [sortOptions, setSortOptions] = React.useState<TSalesSortOptions>({
     by: "kode",
@@ -41,6 +42,13 @@ export default function useSalesData({
     from: undefined,
     to: undefined,
   });
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["sales"],
+    queryFn: listSales,
+  });
+
+  const salesData = data?.data || [];
 
   function calculateTotalBarang(sale: TSales) {
     return sale.sales_detail.map((item) => item.barang).length;
@@ -130,6 +138,8 @@ export default function useSalesData({
       currentSort: sortOptions,
       dates,
       grandTotal: calculateGrandTotal(),
+      isLoading,
+      error,
     },
     handler: {
       calculateTotalBarang,
