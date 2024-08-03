@@ -6,6 +6,7 @@ import {
   FormBarangAction,
   TBarang,
 } from "@/lib/api/barang/definitions";
+import { properizeWord } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -79,7 +80,15 @@ export default function FormBarang({
   const onSubmit = async (data: z.infer<typeof BarangDto>) => {
     setSubmitting(true);
 
-    const response = await submitHandler(data);
+    const { nama, kode, ...rest } = data;
+    const properizedNama = properizeWord(nama);
+    const properizedKode = kode?.toUpperCase();
+
+    const response = await submitHandler({
+      nama: properizedNama,
+      kode: properizedKode,
+      ...rest,
+    });
 
     if (response.status === 201 || response.status === 200) {
       form.reset();
