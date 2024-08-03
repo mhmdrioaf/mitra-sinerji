@@ -133,5 +133,8 @@ export default function useChart() {
     data: chartData,
     config: chartConfig,
     years: years,
+    isLoading: query.isLoading,
+    error: query.error,
+    isEmpty: data.length < 1,
   };
 }
