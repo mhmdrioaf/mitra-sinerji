@@ -44,7 +44,7 @@ interface IFormSales {
 }
 
 export default function FormSales({ dataBarang, dataCustomer }: IFormSales) {
-  const { form, state } = useSales({ dataBarang, dataCustomer });
+  const { form, state, refs } = useSales({ dataBarang, dataCustomer });
 
   return (
     <div className="min-h-svh relative">
@@ -53,7 +53,11 @@ export default function FormSales({ dataBarang, dataCustomer }: IFormSales) {
           <div className="inline-flex items-center gap-2">
             <Popover>
               <PopoverTrigger asChild>
-                <Button className="w-full md:w-fit" variant="outline">
+                <Button
+                  className="w-full md:w-fit transition-all"
+                  variant="default"
+                  ref={refs.barang}
+                >
                   Tambah Barang
                 </Button>
               </PopoverTrigger>
@@ -91,7 +95,11 @@ export default function FormSales({ dataBarang, dataCustomer }: IFormSales) {
 
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" className="w-full md:w-fit">
+                <Button
+                  variant="outline"
+                  className="w-full md:w-fit transition-all"
+                  ref={refs.customer}
+                >
                   Pilih Customer
                 </Button>
               </PopoverTrigger>
@@ -135,11 +143,12 @@ export default function FormSales({ dataBarang, dataCustomer }: IFormSales) {
           <Popover>
             <PopoverTrigger asChild>
               <Button
-                variant={"outline"}
+                variant="default"
                 className={cn(
-                  "w-full md:w-fit justify-center md:justify-start text-center md:text-left font-normal",
-                  !state.date && "text-muted-foreground"
+                  "w-full md:w-fit justify-center md:justify-start text-center md:text-left font-normal transition-all",
+                  !state.date && "text-primary-foreground/85"
                 )}
+                ref={refs.tgl}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
                 {state.date ? (
@@ -162,122 +171,133 @@ export default function FormSales({ dataBarang, dataCustomer }: IFormSales) {
             </PopoverContent>
           </Popover>
         </div>
-        <Table>
-          <TableHeader>
-            <TableRow className="border">
-              <TableHead rowSpan={2} className="text-center border-r">
-                Aksi
-              </TableHead>
-              <TableHead rowSpan={2} className="text-center border-r">
-                No
-              </TableHead>
-              <TableHead rowSpan={2} className="text-center border-r">
-                Kode Barang
-              </TableHead>
-              <TableHead rowSpan={2} className="text-center border-r">
-                Nama Barang
-              </TableHead>
-              <TableHead rowSpan={2} className="text-center border-r">
-                Harga Bandrol
-              </TableHead>
-              <TableHead rowSpan={2} className="text-center border-r">
-                Qty
-              </TableHead>
-              <TableHead
-                rowSpan={1}
-                colSpan={2}
-                className="text-center border-r"
-              >
-                Diskon
-              </TableHead>
-              <TableHead rowSpan={2} className="text-center border-r">
-                Harga Diskon
-              </TableHead>
-              <TableHead rowSpan={2} className="text-center">
-                Total
-              </TableHead>
-            </TableRow>
-            <TableRow className="border">
-              <TableHead className="text-center border-r">%</TableHead>
-              <TableHead className="text-center border-r">{"(Rp)"}</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody className="border">
-            {form.productData.map((detail, index) => (
-              <TableRow key={detail.barang.id}>
-                <TableCell className="text-center border-r">
-                  <Button
-                    variant="destructive"
-                    size="icon"
-                    onClick={() => form.handler.salesDetail.remove(detail.id)}
-                  >
-                    <Trash2Icon className="w-4 h-4" />
-                  </Button>
-                </TableCell>
-                <TableCell className="text-center border-r">
-                  {index + 1}
-                </TableCell>
-                <TableCell className="text-center border-r">
-                  {detail.barang.kode}
-                </TableCell>
-                <TableCell className="text-center border-r">
-                  {detail.barang.nama}
-                </TableCell>
-                <TableCell className="text-center border-r">
-                  {form.handler.formatCurrency(detail.barang.harga)}
-                </TableCell>
-                <TableCell className="text-center border-r">
-                  <Input
-                    inputMode="numeric"
-                    min={0}
-                    max={100}
-                    value={detail.qty}
-                    className="min-w-[8ch] max-w-[8ch] text-center mx-auto"
-                    onChange={(e) =>
-                      form.handler.salesDetail.quantityInput(
-                        e.target.value,
-                        detail.id
-                      )
-                    }
-                  />
-                </TableCell>
-                <TableCell className="text-center border-r">
-                  <div className="w-full inline-flex justify-center items-center gap-2">
+
+        {form.productData.length === 0 ? (
+          <div className="w-full flex flex-col gap-2 justify-center items-center">
+            <span className="text-primary/85">
+              Belum ada barang yang di input
+            </span>
+
+            <Button variant="outline">Tambahkan Barang</Button>
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow className="border">
+                <TableHead rowSpan={2} className="text-center border-r">
+                  Aksi
+                </TableHead>
+                <TableHead rowSpan={2} className="text-center border-r">
+                  No
+                </TableHead>
+                <TableHead rowSpan={2} className="text-center border-r">
+                  Kode Barang
+                </TableHead>
+                <TableHead rowSpan={2} className="text-center border-r">
+                  Nama Barang
+                </TableHead>
+                <TableHead rowSpan={2} className="text-center border-r">
+                  Harga Bandrol
+                </TableHead>
+                <TableHead rowSpan={2} className="text-center border-r">
+                  Qty
+                </TableHead>
+                <TableHead
+                  rowSpan={1}
+                  colSpan={2}
+                  className="text-center border-r"
+                >
+                  Diskon
+                </TableHead>
+                <TableHead rowSpan={2} className="text-center border-r">
+                  Harga Diskon
+                </TableHead>
+                <TableHead rowSpan={2} className="text-center">
+                  Total
+                </TableHead>
+              </TableRow>
+              <TableRow className="border">
+                <TableHead className="text-center border-r">%</TableHead>
+                <TableHead className="text-center border-r">{"(Rp)"}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody className="border">
+              {form.productData.map((detail, index) => (
+                <TableRow key={detail.barang.id}>
+                  <TableCell className="text-center border-r">
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      onClick={() => form.handler.salesDetail.remove(detail.id)}
+                    >
+                      <Trash2Icon className="w-4 h-4" />
+                    </Button>
+                  </TableCell>
+                  <TableCell className="text-center border-r">
+                    {index + 1}
+                  </TableCell>
+                  <TableCell className="text-center border-r">
+                    {detail.barang.kode}
+                  </TableCell>
+                  <TableCell className="text-center border-r">
+                    {detail.barang.nama}
+                  </TableCell>
+                  <TableCell className="text-center border-r">
+                    {form.handler.formatCurrency(detail.barang.harga)}
+                  </TableCell>
+                  <TableCell className="text-center border-r">
                     <Input
                       inputMode="numeric"
                       min={0}
                       max={100}
-                      value={
-                        detail.diskon_pct > 0
-                          ? detail.diskon_pct.toString().replace(/\D/g, "")
-                          : detail.diskon_pct
-                      }
-                      className="min-w-[8ch] max-w-[8ch] text-center"
+                      value={detail.qty}
+                      className="min-w-[8ch] max-w-[8ch] text-center mx-auto"
                       onChange={(e) =>
-                        form.handler.salesDetail.discountInput(
+                        form.handler.salesDetail.quantityInput(
                           e.target.value,
                           detail.id
                         )
                       }
                     />
-                    <span className="text-xs">%</span>
-                  </div>
-                </TableCell>
-                <TableCell className="text-center border-r">
-                  {detail.diskon_nilai > 0
-                    ? form.handler.formatCurrency(detail.diskon_nilai)
-                    : "-"}
-                </TableCell>
-                <TableCell className="text-center border-r">
-                  {form.handler.formatCurrency(detail.harga_diskon)}
-                </TableCell>
-                <TableCell className="text-center">
-                  {form.handler.formatCurrency(detail.total)}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+                  </TableCell>
+                  <TableCell className="text-center border-r">
+                    <div className="w-full inline-flex justify-center items-center gap-2">
+                      <Input
+                        inputMode="numeric"
+                        min={0}
+                        max={100}
+                        value={
+                          detail.diskon_pct > 0
+                            ? detail.diskon_pct.toString().replace(/\D/g, "")
+                            : detail.diskon_pct
+                        }
+                        className="min-w-[8ch] max-w-[8ch] text-center"
+                        onChange={(e) =>
+                          form.handler.salesDetail.discountInput(
+                            e.target.value,
+                            detail.id
+                          )
+                        }
+                      />
+                      <span className="text-xs">%</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-center border-r">
+                    {detail.diskon_nilai > 0
+                      ? form.handler.formatCurrency(detail.diskon_nilai)
+                      : "-"}
+                  </TableCell>
+                  <TableCell className="text-center border-r">
+                    {form.handler.formatCurrency(detail.harga_diskon)}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {form.handler.formatCurrency(detail.total)}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </div>
 
       {form.productData.length > 0 && (

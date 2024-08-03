@@ -44,6 +44,12 @@ export type TSalesHook = {
       search: (key: keyof TSearch, value: string) => void;
     };
   };
+
+  refs: {
+    barang: React.MutableRefObject<HTMLButtonElement | null>;
+    customer: React.MutableRefObject<HTMLButtonElement | null>;
+    tgl: React.MutableRefObject<HTMLButtonElement | null>;
+  };
 };
 
 export type TSearch = {
@@ -69,6 +75,10 @@ export function useSales({
 
   const { toast } = useToast();
   const router = useRouter();
+
+  const barangRef = React.useRef<HTMLButtonElement | null>(null);
+  const customerRef = React.useRef<HTMLButtonElement | null>(null);
+  const tglRef = React.useRef<HTMLButtonElement | null>(null);
 
   const barangToAdd =
     dataBarang?.filter(
@@ -206,6 +216,9 @@ export function useSales({
         description: "Barang tidak boleh kosong.",
       });
       setSubmitting(false);
+      if (barangRef.current) {
+        barangRef.current.click();
+      }
       return;
     }
     if (!customerId) {
@@ -215,6 +228,9 @@ export function useSales({
         description: "Customer tidak boleh kosong.",
       });
       setSubmitting(false);
+      if (customerRef.current) {
+        customerRef.current.click();
+      }
       return;
     }
     if (!date) {
@@ -224,6 +240,9 @@ export function useSales({
         description: "Tanggal transaksi tidak boleh kosong.",
       });
       setSubmitting(false);
+      if (tglRef.current) {
+        tglRef.current.click();
+      }
       return;
     }
 
@@ -318,6 +337,12 @@ export function useSales({
         submit: onSubmit,
         search: onSearch,
       },
+    },
+
+    refs: {
+      barang: barangRef,
+      customer: customerRef,
+      tgl: tglRef,
     },
   };
 }
