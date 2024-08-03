@@ -33,3 +33,15 @@ export function getRandomMultipleOfFive(
   const randomIndex = Math.floor(Math.random() * multiplesOfFive.length);
   return multiplesOfFive[randomIndex];
 }
+
+export function properizeWord(word: string): string {
+  const splittedWords = word.split(" ");
+  let result: string = "";
+  splittedWords.forEach((word) => {
+    const firstLetter = word.charAt(0).toUpperCase();
+    const restOfWord = word.slice(1).toLowerCase();
+    result += firstLetter + restOfWord + " ";
+  });
+
+  return result.trim();
+}
