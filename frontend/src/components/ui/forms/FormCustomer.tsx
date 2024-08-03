@@ -6,7 +6,7 @@ import {
   FormCustomerAction,
   TCustomer,
 } from "@/lib/api/customer/definitions";
-import { properizeWord } from "@/lib/utils";
+import { properizePhoneNumber, properizeWord } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -78,15 +78,24 @@ export default function FormCustomer({
   const onSubmit = async (data: z.infer<typeof CustomerDto>) => {
     setSubmitting(true);
 
-    const { kode, name, ...rest } = data;
+    const { kode, name, telp } = data;
 
     const properizedKode = kode?.toUpperCase();
     const properizedName = properizeWord(name);
+    const properizedPhoneNumber = properizePhoneNumber(telp);
+
+    if (!properizedPhoneNumber) {
+      form.setError("telp", {
+        message: "Nomor telepon tidak valid",
+      });
+      setSubmitting(false);
+      return;
+    }
 
     const response = await submitHandler({
       kode: properizedKode,
       name: properizedName,
-      ...rest,
+      telp: properizedPhoneNumber,
     });
 
     if (response.status === 201 || response.status === 200) {
@@ -159,7 +168,11 @@ export default function FormCustomer({
             <FormItem>
               <FormLabel>Nomor Telepon Customer</FormLabel>
               <FormControl>
-                <Input placeholder="62xxxx" inputMode="numeric" {...field} />
+                <Input
+                  placeholder="Telepon rumah / Handphone"
+                  inputMode="numeric"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

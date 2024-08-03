@@ -45,3 +45,26 @@ export function properizeWord(word: string): string {
 
   return result.trim();
 }
+
+export function properizePhoneNumber(phoneNumber: string): string | null {
+  const trimmed = phoneNumber.replace(/\s/g, "");
+  const firstDigit = phoneNumber.charAt(0);
+
+  const digits = trimmed.match(/\d/g);
+  const isValid = digits && digits.length === trimmed.length;
+
+  if (!isValid) return null;
+
+  if (Number(firstDigit) === 0) {
+    return trimmed;
+  } else if (Number(firstDigit) === 6) {
+    const rest = trimmed.slice(2);
+    return "0" + rest;
+  } else if (firstDigit === "+") {
+    return trimmed.slice(1);
+  } else if (Number(firstDigit) === 8) {
+    return "0" + trimmed;
+  } else {
+    return null;
+  }
+}
