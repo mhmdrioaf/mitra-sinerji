@@ -1,13 +1,10 @@
 "use client";
 
 import { ChartConfig } from "@/components/ui/chart";
-import { useQuery } from "@tanstack/react-query";
-import { listSales } from "../api/sales/fetcher";
+import { TSales } from "../api/sales/definitions";
 import { getRandomNumber } from "../utils";
 
-export default function useChart() {
-  const query = useQuery({ queryKey: ["sales"], queryFn: listSales });
-
+export default function useChart({ sales }: { sales: TSales[] }) {
   const monthString = [
     "Januari",
     "Februari",
@@ -23,7 +20,7 @@ export default function useChart() {
     "Desember",
   ];
 
-  const data = query.data?.data || [];
+  const data = sales;
 
   function getSalesYears() {
     if (data.length > 0) {
@@ -102,13 +99,13 @@ export default function useChart() {
     return dataSets;
   }
 
-  const sales = getSalesByYearsAndMonths();
+  const parsedSales = getSalesByYearsAndMonths();
 
-  const salesKeys = Object.keys(sales);
+  const parsedSalesKeys = Object.keys(parsedSales);
 
-  const chartData = salesKeys.map((key) => ({
+  const chartData = parsedSalesKeys.map((key) => ({
     month: key,
-    ...sales[key],
+    ...parsedSales[key],
   }));
 
   const chartConfig: {
@@ -133,8 +130,6 @@ export default function useChart() {
     data: chartData,
     config: chartConfig,
     years: years,
-    isLoading: query.isLoading,
-    error: query.error,
     isEmpty: data.length < 1,
   };
 }
