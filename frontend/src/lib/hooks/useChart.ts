@@ -23,17 +23,24 @@ export default function useChart({ sales }: { sales: TSales[] }) {
   const data = sales;
 
   function getSalesYears() {
-    const first = data.reduce((a, b) => {
-      return new Date(a.tgl) < new Date(b.tgl) ? a : b;
-    });
+    if (data.length > 0) {
+      const first = data.reduce((a, b) => {
+        return new Date(a.tgl) < new Date(b.tgl) ? a : b;
+      });
 
-    const last = data.reduce((a, b) => {
-      return new Date(a.tgl) > new Date(b.tgl) ? a : b;
-    });
+      const last = data.reduce((a, b) => {
+        return new Date(a.tgl) > new Date(b.tgl) ? a : b;
+      });
+
+      return {
+        first: new Date(first.tgl).getFullYear(),
+        last: new Date(last.tgl).getFullYear(),
+      };
+    }
 
     return {
-      first: new Date(first.tgl).getFullYear(),
-      last: new Date(last.tgl).getFullYear(),
+      first: new Date().getFullYear(),
+      last: new Date().getFullYear(),
     };
   }
 
@@ -87,10 +94,15 @@ export default function useChart({ sales }: { sales: TSales[] }) {
     return dataSets;
   }
 
-  const chartData = monthString.map((month) => ({
-    month: month,
-    ...getDataSets()[month],
-  }));
+  const chartData = monthString.map((month) => {
+    const dataSets = getDataSets();
+    if (dataSets[month]) {
+      return {
+        month,
+        ...dataSets[month],
+      };
+    }
+  });
 
   const getChartConfig = () => {
     const chartConfig: {
