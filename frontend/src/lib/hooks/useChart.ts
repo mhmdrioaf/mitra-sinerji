@@ -23,113 +23,101 @@ export default function useChart({ sales }: { sales: TSales[] }) {
   const data = sales;
 
   function getSalesYears() {
-    if (data.length > 0) {
-      const sortedSales = data.sort((a, b) => {
-        const dateA = new Date(a.tgl);
-        const dateB = new Date(b.tgl);
+    const first = data.reduce((a, b) => {
+      return new Date(a.tgl) < new Date(b.tgl) ? a : b;
+    });
 
-        if (dateA < dateB) return -1;
-        if (dateA > dateB) return 1;
+    const last = data.reduce((a, b) => {
+      return new Date(a.tgl) > new Date(b.tgl) ? a : b;
+    });
 
-        return 0;
-      });
-
-      const firstYears = new Date(sortedSales[0].tgl).getFullYear();
-      const lastYears = new Date(
-        sortedSales[sortedSales.length - 1].tgl
-      ).getFullYear();
-
-      return {
-        first: firstYears,
-        last: lastYears,
-      };
-    }
+    return {
+      first: new Date(first.tgl).getFullYear(),
+      last: new Date(last.tgl).getFullYear(),
+    };
   }
 
   function getYearsArray() {
     const date = getSalesYears();
+    const years = Array.from({ length: date.last - date.first + 1 }).map(
+      (_, i) => date.first + i
+    );
 
-    if (date) {
-      const years = Array.from({ length: date.last - date.first + 1 }).map(
-        (_, i) => date.first + i
-      );
-
-      return years;
-    }
-
-    return [];
+    return years;
   }
 
-  function getSalesByYearsAndMonths() {
-    const months = Array.from({ length: monthString.length }).map((_, i) => i);
+  function getDataSets() {
     const years = getYearsArray();
 
     const dataSets: {
-      [months: string]: {
-        [years: number]: number;
+      [month: string]: {
+        [year: number]: number;
       };
     } = {};
 
-    years.forEach((year) => {
-      months.forEach((month) => {
-        const sales = data
-          .filter((sale) => {
-            const salesDate = new Date(sale.tgl);
-            const salesMonth = salesDate.getMonth();
-            const salesYears = salesDate.getFullYear();
+    for (const sale of data) {
+      const sDate = new Date(sale.tgl);
+      const sMonth = sDate.getMonth();
+      const sYears = sDate.getFullYear();
 
-            return salesMonth === month && salesYears === year;
-          })
-          .reduce((a, b) => a + b.total_bayar, 0);
+      for (let y = 0; y < years.length; y++) {
+        const year = years[y];
 
-        if (dataSets[monthString[month]]) {
-          if (!dataSets[monthString[month]][year]) {
-            dataSets[monthString[month]][year] = sales;
+        for (let m = 0; m < 12; m++) {
+          const month = monthString[m];
+
+          const yearsMonthSale =
+            sMonth === m && sYears === year ? sale.total_bayar : 0;
+
+          if (!dataSets[month]) {
+            dataSets[month] = {
+              [year]: yearsMonthSale,
+            };
           } else {
-            dataSets[monthString[month]][year] += sales;
+            if (dataSets[month][year]) {
+              dataSets[month][year] += yearsMonthSale;
+            } else {
+              dataSets[month][year] = yearsMonthSale;
+            }
           }
-        } else {
-          dataSets[monthString[month]] = {
-            [year]: sales,
-          };
         }
-      });
-    });
+      }
+    }
 
     return dataSets;
   }
 
-  const parsedSales = getSalesByYearsAndMonths();
-
-  const parsedSalesKeys = Object.keys(parsedSales);
-
-  const chartData = parsedSalesKeys.map((key) => ({
-    month: key,
-    ...parsedSales[key],
+  const chartData = monthString.map((month) => ({
+    month: month,
+    ...getDataSets()[month],
   }));
 
-  const chartConfig: {
-    [key: string]: {
-      label: string;
-      color: string;
-    };
-  } = {} satisfies ChartConfig;
-
-  const years = getYearsArray();
-
-  years.forEach((year) => {
-    if (!chartConfig[year]) {
-      chartConfig[year] = {
-        label: year.toString(),
-        color: `hsl(31, 31%, ${getRandomNumber(26, 50)}%)`,
+  const getChartConfig = () => {
+    const chartConfig: {
+      [key: string]: {
+        label: string;
+        color: string;
       };
+    } = {} satisfies ChartConfig;
+
+    const years = getYearsArray();
+
+    for (const year of years) {
+      if (!chartConfig[year]) {
+        chartConfig[year] = {
+          label: year.toString(),
+          color: `hsl(31, 31%, ${getRandomNumber(26, 50)}%)`,
+        };
+      }
     }
-  });
+
+    return chartConfig;
+  };
 
   return {
     data: chartData,
-    config: chartConfig,
-    years: years,
+    config: getChartConfig(),
+    years: getYearsArray(),
     isEmpty: data.length < 1,
   };
 }
