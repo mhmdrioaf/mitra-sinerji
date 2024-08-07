@@ -1,4 +1,5 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import {
   MD3LightTheme as DefaultTheme,
@@ -6,10 +7,6 @@ import {
   PaperProvider,
 } from "react-native-paper";
 import { createMaterialBottomTabNavigator } from "react-native-paper/react-navigation";
-import HomePage from "./(tabs)";
-import BarangPage from "./(tabs)/barang";
-import CustomerPage from "./(tabs)/customer";
-import TransaksiPage from "./(tabs)/transaksi";
 
 const test = MD2Colors.brown400;
 
@@ -61,69 +58,17 @@ const theme = {
 
 const Tab = createMaterialBottomTabNavigator();
 
+const queryClient = new QueryClient();
+
 export default function RootLayout() {
   return (
-    <>
+    <QueryClientProvider client={queryClient}>
       <PaperProvider theme={theme}>
-        <Tab.Navigator
-          initialRouteName="(tabs)/index"
-          activeColor={theme.colors.primary}
-        >
-          <Tab.Screen
-            name="(tabs)/index"
-            component={HomePage}
-            options={{
-              tabBarLabel: "Dashboard",
-              tabBarIcon: ({ color }) => (
-                <MaterialCommunityIcons name="home" color={color} size={22} />
-              ),
-            }}
-          />
-          <Tab.Screen
-            name="(tabs)/barang"
-            component={BarangPage}
-            options={{
-              tabBarLabel: "Barang",
-              tabBarIcon: ({ color }) => (
-                <MaterialCommunityIcons
-                  name="package"
-                  color={color}
-                  size={22}
-                />
-              ),
-            }}
-          />
-          <Tab.Screen
-            name="(tabs)/customer"
-            component={CustomerPage}
-            options={{
-              tabBarLabel: "Customer",
-              tabBarIcon: ({ color }) => (
-                <MaterialCommunityIcons
-                  name="account-group"
-                  color={color}
-                  size={22}
-                />
-              ),
-            }}
-          />
-          <Tab.Screen
-            name="(tabs)/transaksi"
-            component={TransaksiPage}
-            options={{
-              tabBarLabel: "Transaksi",
-              tabBarIcon: ({ color }) => (
-                <MaterialCommunityIcons
-                  name="cash-register"
-                  color={color}
-                  size={22}
-                />
-              ),
-            }}
-          />
-        </Tab.Navigator>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        </Stack>
+        <StatusBar style="dark" backgroundColor={theme.colors.background} />
       </PaperProvider>
-      <StatusBar style="dark" backgroundColor={theme.colors.background} />
-    </>
+    </QueryClientProvider>
   );
 }
