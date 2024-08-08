@@ -9,6 +9,7 @@ import {
 import { InputModeOptions } from "react-native";
 import CurrencyInput from "react-native-currency-input";
 import { Text, TextInput, useTheme } from "react-native-paper";
+import { ThemeProp } from "react-native-paper/lib/typescript/types";
 
 interface FormInputControllerProps<FieldsType extends FieldValues> {
   name: Path<FieldsType>;
@@ -26,6 +27,7 @@ interface Props<FieldsType extends FieldValues>
   asCurrency?: boolean;
   disabled?: boolean;
   inputMode?: InputModeOptions;
+  theme?: ThemeProp;
 }
 
 export default function FormInput<T extends FieldValues>({
@@ -72,6 +74,7 @@ export default function FormInput<T extends FieldValues>({
               value={field?.value}
               onBlur={field.onBlur}
               disabled={props.disabled}
+              theme={props.theme}
             />
           )}
 

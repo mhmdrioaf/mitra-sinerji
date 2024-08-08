@@ -2,6 +2,7 @@ import { Api } from "@/constants/Api";
 import { TApiResponse } from "@/types/api";
 import { BarangDto, TBarang } from "@/types/barang";
 import { CustomerDto, TCustomer } from "@/types/customer";
+import { SalesDto, TSales } from "@/types/sales";
 import * as z from "zod";
 
 export async function listBarang(): Promise<TApiResponse<TBarang[]>> {
@@ -112,6 +113,29 @@ export async function deleteCustomer(
     method: "DELETE",
   });
   const response: TApiResponse<TCustomer> = await res.json();
+
+  return response;
+}
+
+export async function listSales(): Promise<TApiResponse<TSales[]>> {
+  const res = await fetch(Api.Sales.List);
+  const response: TApiResponse<TSales[]> = await res.json();
+
+  return response;
+}
+
+export async function createSales(
+  dto: z.infer<typeof SalesDto>
+): Promise<TApiResponse<TSales>> {
+  const res = await fetch(Api.Sales.Create, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(dto),
+  });
+
+  const response: TApiResponse<TSales> = await res.json();
 
   return response;
 }

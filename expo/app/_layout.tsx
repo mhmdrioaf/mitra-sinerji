@@ -67,6 +67,7 @@ export default function RootLayout() {
             options={{ headerShown: false }}
           />
           <Stack.Screen name="customer/edit" options={{ headerShown: false }} />
+          <Stack.Screen name="sales/create" options={{ headerShown: false }} />
         </Stack>
         <StatusBar style="dark" backgroundColor={theme.colors.background} />
       </PaperProvider>
