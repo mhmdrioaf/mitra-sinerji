@@ -6,8 +6,10 @@ import {
   ActivityIndicator,
   Button,
   Card,
+  Dialog,
   FAB,
   MD2Colors,
+  Portal,
   Searchbar,
   Text,
   useTheme,
@@ -17,6 +19,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function BarangPage() {
   const { state, handler } = useBarang();
   const theme = useTheme();
+
   return (
     <SafeAreaView style={styles.container}>
       <View>
@@ -63,45 +66,52 @@ export default function BarangPage() {
               />
             }
           >
-            {state.data.map((barang) => (
-              <Card key={barang.id} mode="contained">
-                <Card.Title title={barang.kode} subtitle={barang.nama} />
-                <Card.Content>
-                  <Text>
-                    {barang.harga.toLocaleString("id-ID", {
-                      style: "currency",
-                      currency: "IDR",
-                    })}
-                  </Text>
-                </Card.Content>
+            {state.data.length > 0 ? (
+              state.data.map((barang) => (
+                <Card key={barang.id} mode="contained">
+                  <Card.Title title={barang.kode} subtitle={barang.nama} />
+                  <Card.Content>
+                    <Text>
+                      {barang.harga.toLocaleString("id-ID", {
+                        style: "currency",
+                        currency: "IDR",
+                      })}
+                    </Text>
+                  </Card.Content>
 
-                <Card.Actions>
-                  <Button
-                    buttonColor={theme.colors.primary}
-                    textColor={theme.colors.onPrimary}
-                    icon="pencil"
-                    onPress={() =>
-                      router.push({
-                        pathname: "/barang/edit",
-                        params: {
-                          id: barang.id,
-                        },
-                      })
-                    }
-                  >
-                    Edit
-                  </Button>
+                  <Card.Actions>
+                    <Button
+                      buttonColor={theme.colors.primary}
+                      textColor={theme.colors.onPrimary}
+                      icon="pencil"
+                      onPress={() =>
+                        router.push({
+                          pathname: "/barang/edit",
+                          params: {
+                            id: barang.id,
+                          },
+                        })
+                      }
+                    >
+                      Edit
+                    </Button>
 
-                  <Button
-                    buttonColor={theme.colors.error}
-                    textColor={theme.colors.onError}
-                    icon="delete"
-                  >
-                    Hapus
-                  </Button>
-                </Card.Actions>
-              </Card>
-            ))}
+                    <Button
+                      buttonColor={theme.colors.error}
+                      textColor={theme.colors.onError}
+                      onPress={() => handler.showDeleteModal(barang.id)}
+                      icon="delete"
+                    >
+                      Hapus
+                    </Button>
+                  </Card.Actions>
+                </Card>
+              ))
+            ) : (
+              <Text variant="bodySmall" style={{ textAlign: "center" }}>
+                Tidak ada data barang...
+              </Text>
+            )}
           </ScrollView>
         </>
       )}
@@ -111,6 +121,24 @@ export default function BarangPage() {
         icon="plus"
         onPress={() => router.push("/barang/create")}
       />
+
+      <Portal>
+        <Dialog visible={state.deleting} onDismiss={handler.hideDeleteModal}>
+          <Dialog.Title>
+            Apakah anda yakin akan menghapus barang ini?
+          </Dialog.Title>
+          <Dialog.Content>
+            <Text variant="bodyMedium">
+              Tindakan ini akan menghapus data barang selamanya di database.
+              Lanjutkan penghapusan barang?
+            </Text>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={handler.hideDeleteModal}>Batal</Button>
+            <Button onPress={handler.delete}>Hapus</Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
     </SafeAreaView>
   );
 }

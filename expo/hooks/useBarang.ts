@@ -1,7 +1,8 @@
-import { listBarang } from "@/lib/api";
+import { deleteBarang, listBarang } from "@/lib/api";
 import { TBarang } from "@/types/barang";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { ToastAndroid } from "react-native";
 
 export default function useBarang() {
   const queryClient = useQueryClient();
@@ -23,6 +24,8 @@ export default function useBarang() {
 
   const [search, setSearch] = useState<string>("");
   const [refreshing, setRefreshing] = useState<boolean>(false);
+  const [deleting, setIsDeleting] = useState<boolean>(false);
+  const [idToDelete, setIdToDelete] = useState<number | null>(null);
 
   const dataBarang = data?.data || [];
 
@@ -52,6 +55,50 @@ export default function useBarang() {
     mutation.mutate();
   }
 
+  function showDeleteModal(id: number) {
+    setIsDeleting(true);
+    setIdToDelete(id);
+  }
+
+  function hideDeleteModal() {
+    setIsDeleting(false);
+    setIdToDelete(null);
+  }
+
+  async function onDelete() {
+    if (!idToDelete) {
+      ToastAndroid.showWithGravityAndOffset(
+        "Data barang tidak ditemukan",
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM,
+        25,
+        50
+      );
+      return;
+    }
+    const response = await deleteBarang(idToDelete);
+
+    if (response.status === 200) {
+      ToastAndroid.showWithGravityAndOffset(
+        "Berhasil menghapus data barang",
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM,
+        25,
+        50
+      );
+      mutation.mutate();
+      hideDeleteModal();
+    } else {
+      ToastAndroid.showWithGravityAndOffset(
+        "Terjadi kesalahan ketika menghapus data barang",
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM,
+        25,
+        50
+      );
+    }
+  }
+
   return {
     state: {
       data: filterData(),
@@ -59,10 +106,14 @@ export default function useBarang() {
       error: error,
       search: search,
       refreshing,
+      deleting,
     },
     handler: {
       search: onSearch,
       refresh: onRefresh,
+      delete: onDelete,
+      showDeleteModal,
+      hideDeleteModal,
     },
   };
 }
