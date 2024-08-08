@@ -1,5 +1,6 @@
 import useBarang from "@/hooks/useBarang";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import { RefreshControl, ScrollView, StyleSheet, View } from "react-native";
 import {
   ActivityIndicator,
@@ -97,7 +98,11 @@ export default function BarangPage() {
         </>
       )}
 
-      <FAB style={styles.fab} icon="plus" onPress={() => {}} />
+      <FAB
+        style={styles.fab}
+        icon="plus"
+        onPress={() => router.push("/barang/create")}
+      />
     </SafeAreaView>
   );
 }

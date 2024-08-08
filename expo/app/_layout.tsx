@@ -3,12 +3,8 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import {
   MD3LightTheme as DefaultTheme,
-  MD2Colors,
   PaperProvider,
 } from "react-native-paper";
-import { createMaterialBottomTabNavigator } from "react-native-paper/react-navigation";
-
-const test = MD2Colors.brown400;
 
 const theme = {
   ...DefaultTheme,
@@ -56,8 +52,6 @@ const theme = {
   },
 };
 
-const Tab = createMaterialBottomTabNavigator();
-
 const queryClient = new QueryClient();
 
 export default function RootLayout() {
@@ -66,6 +60,7 @@ export default function RootLayout() {
       <PaperProvider theme={theme}>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="barang/create" options={{ headerShown: false }} />
         </Stack>
         <StatusBar style="dark" backgroundColor={theme.colors.background} />
       </PaperProvider>

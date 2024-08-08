@@ -16,5 +16,10 @@ export const BarangDto = z.object({
     .string()
     .min(1, "Nama barang tidak boleh kosong")
     .max(100, "Nama barang tidak boleh lebih dari 100 karakter"),
-  harga: z.number().int().positive("Harga barang harus lebih dari 0"),
+  harga: z
+    .number({
+      message: "Harga tidak boleh kosong",
+    })
+    .int()
+    .positive("Harga barang harus lebih dari 0"),
 });
