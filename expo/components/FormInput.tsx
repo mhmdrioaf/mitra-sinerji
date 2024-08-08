@@ -6,6 +6,7 @@ import {
   Path,
   RegisterOptions,
 } from "react-hook-form";
+import { InputModeOptions } from "react-native";
 import CurrencyInput from "react-native-currency-input";
 import { Text, TextInput, useTheme } from "react-native-paper";
 
@@ -24,6 +25,7 @@ interface Props<FieldsType extends FieldValues>
   asNumber?: boolean;
   asCurrency?: boolean;
   disabled?: boolean;
+  inputMode?: InputModeOptions;
 }
 
 export default function FormInput<T extends FieldValues>({
@@ -61,6 +63,7 @@ export default function FormInput<T extends FieldValues>({
             <TextInput
               label={props.label}
               mode="outlined"
+              inputMode={props.inputMode}
               onChangeText={(text) =>
                 props.asNumber
                   ? field.onChange(Number(text))
