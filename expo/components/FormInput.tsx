@@ -23,6 +23,7 @@ interface Props<FieldsType extends FieldValues>
   placeholder?: string;
   asNumber?: boolean;
   asCurrency?: boolean;
+  disabled?: boolean;
 }
 
 export default function FormInput<T extends FieldValues>({
@@ -67,6 +68,7 @@ export default function FormInput<T extends FieldValues>({
               }
               value={field?.value}
               onBlur={field.onBlur}
+              disabled={props.disabled}
             />
           )}
 
