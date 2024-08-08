@@ -61,6 +61,7 @@ export default function RootLayout() {
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="barang/create" options={{ headerShown: false }} />
+          <Stack.Screen name="barang/edit" options={{ headerShown: false }} />
         </Stack>
         <StatusBar style="dark" backgroundColor={theme.colors.background} />
       </PaperProvider>

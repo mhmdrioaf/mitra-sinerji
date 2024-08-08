@@ -80,6 +80,14 @@ export default function BarangPage() {
                     buttonColor={theme.colors.primary}
                     textColor={theme.colors.onPrimary}
                     icon="pencil"
+                    onPress={() =>
+                      router.push({
+                        pathname: "/barang/edit",
+                        params: {
+                          id: barang.id,
+                        },
+                      })
+                    }
                   >
                     Edit
                   </Button>
